@@ -1,11 +1,11 @@
 import archiver from 'archiver'
-import fs from 'fs-extra'
-import path from 'path'
-import webpack from 'webpack'
-import ProgressBarPlugin from 'progress-bar-webpack-plugin'
 import CssMinimizerPlugin from 'css-minimizer-webpack-plugin'
+import fs from 'fs-extra'
 import MiniCssExtractPlugin from 'mini-css-extract-plugin'
+import path from 'path'
+import ProgressBarPlugin from 'progress-bar-webpack-plugin'
 import TerserPlugin from 'terser-webpack-plugin'
+import webpack from 'webpack'
 import { BundleAnalyzerPlugin } from 'webpack-bundle-analyzer'
 
 const outdir = 'build'
@@ -14,10 +14,21 @@ const __dirname = path.resolve()
 const isProduction = process.argv[2] !== '--development' // --production and --analyze are both production
 const isAnalyzing = process.argv[2] === '--analyze'
 
+/**
+ * Deletes the old builded files in output directory.
+ *
+ */
 async function deleteOldDir() {
   await fs.rm(outdir, { recursive: true, force: true })
 }
 
+/**
+ * generates the webpack config
+ * @param {*} isWithoutKatex
+ * @param {*} isWithoutTiktoken
+ * @param {*} minimal
+ * @param {*} callback
+ */
 async function runWebpack(isWithoutKatex, isWithoutTiktoken, minimal, callback) {
   const shared = [
     'preact',
@@ -286,6 +297,12 @@ async function copyFiles(entryPoints, targetDir) {
   )
 }
 
+/**
+ * Generate the necessary output files for both Chromium and Firefox browsers based on the common files.
+ *
+ * @param {string} outputDirSuffix - the suffix to be added to the output directory
+ * @return {Promise<void>} a Promise that resolves when the output files are generated
+ */
 async function finishOutput(outputDirSuffix) {
   const commonFiles = [
     { src: 'src/logo.png', dst: 'logo.png' },
@@ -323,6 +340,12 @@ async function finishOutput(outputDirSuffix) {
   if (isProduction) await zipFolder(firefoxOutputDir)
 }
 
+/**
+ * Generates a webpack callback function that handles errors and stats, then awaits the finishOutputFunc.
+ *
+ * @param {Function} finishOutputFunc - The function to call after handling errors and stats.
+ * @return {Function} The webpack callback function.
+ */
 function generateWebpackCallback(finishOutputFunc) {
   return async function webpackCallback(err, stats) {
     if (err || stats.hasErrors()) {
@@ -344,6 +367,8 @@ async function build() {
     //   generateWebpackCallback(() => finishOutput('-without-katex')),
     // )
     // await new Promise((r) => setTimeout(r, 5000))
+    // 1. runWebpack进行编译
+    // 2. generateWebpackCallback用于讲编译好的代码打包成插件文件
     await runWebpack(
       true,
       true,
