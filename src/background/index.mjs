@@ -1,39 +1,41 @@
 import Browser from 'webextension-polyfill'
-import {
-  deleteConversation,
-  generateAnswersWithChatgptWebApi,
-  sendMessageFeedback,
-} from '../services/apis/chatgpt-web'
-import { generateAnswersWithBingWebApi } from '../services/apis/bing-web.mjs'
-import {
-  generateAnswersWithChatgptApi,
-  generateAnswersWithGptCompletionApi,
-} from '../services/apis/openai-api'
-import { generateAnswersWithCustomApi } from '../services/apis/custom-api.mjs'
-import { generateAnswersWithAzureOpenaiApi } from '../services/apis/azure-openai-api.mjs'
-import { generateAnswersWithClaudeApi } from '../services/apis/claude-api.mjs'
-import { generateAnswersWithChatGLMApi } from '../services/apis/chatglm-api.mjs'
-import { generateAnswersWithWaylaidwandererApi } from '../services/apis/waylaidwanderer-api.mjs'
+import '../_locales/i18n'
 import {
   azureOpenAiApiModelKeys,
-  claudeApiModelKeys,
-  chatglmApiModelKeys,
   bardWebModelKeys,
   bingWebModelKeys,
+  chatglmApiModelKeys,
   chatgptApiModelKeys,
   chatgptWebModelKeys,
+  claudeApiModelKeys,
   claudeWebModelKeys,
   customApiModelKeys,
   defaultConfig,
   getUserConfig,
   githubThirdPartyApiModelKeys,
   gptApiModelKeys,
+  moonshotApiModelKeys,
   poeWebModelKeys,
   setUserConfig,
-  moonshotApiModelKeys,
 } from '../config/index.mjs'
-import '../_locales/i18n'
-import { openUrl } from '../utils/open-url'
+import { generateAnswersWithAzureOpenaiApi } from '../services/apis/azure-openai-api.mjs'
+import { generateAnswersWithBardWebApi } from '../services/apis/bard-web.mjs'
+import { generateAnswersWithBingWebApi } from '../services/apis/bing-web.mjs'
+import { generateAnswersWithChatGLMApi } from '../services/apis/chatglm-api.mjs'
+import {
+  deleteConversation,
+  generateAnswersWithChatgptWebApi,
+  sendMessageFeedback,
+} from '../services/apis/chatgpt-web'
+import { generateAnswersWithClaudeApi } from '../services/apis/claude-api.mjs'
+import { generateAnswersWithClaudeWebApi } from '../services/apis/claude-web.mjs'
+import { generateAnswersWithCustomApi } from '../services/apis/custom-api.mjs'
+import { generateAnswersWithMoonshotCompletionApi } from '../services/apis/moonshot-api.mjs'
+import {
+  generateAnswersWithChatgptApi,
+  generateAnswersWithGptCompletionApi,
+} from '../services/apis/openai-api'
+import { generateAnswersWithWaylaidwandererApi } from '../services/apis/waylaidwanderer-api.mjs'
 import {
   getBardCookies,
   getBingAccessToken,
@@ -41,11 +43,9 @@ import {
   getClaudeSessionKey,
   registerPortListener,
 } from '../services/wrappers.mjs'
-import { refreshMenu } from './menus.mjs'
+import { openUrl } from '../utils/open-url'
 import { registerCommands } from './commands.mjs'
-import { generateAnswersWithBardWebApi } from '../services/apis/bard-web.mjs'
-import { generateAnswersWithClaudeWebApi } from '../services/apis/claude-web.mjs'
-import { generateAnswersWithMoonshotCompletionApi } from '../services/apis/moonshot-api.mjs'
+import { refreshMenu } from './menus.mjs'
 
 function setPortProxy(port, proxyTabId) {
   port.proxy = Browser.tabs.connect(proxyTabId)
@@ -164,6 +164,7 @@ async function executeApi(session, port, config) {
   }
 }
 
+// 传递消息的主要处理逻辑
 Browser.runtime.onMessage.addListener(async (message, sender) => {
   switch (message.type) {
     case 'FEEDBACK': {
@@ -220,6 +221,7 @@ Browser.runtime.onMessage.addListener(async (message, sender) => {
       refreshMenu()
       break
     case 'PIN_TAB': {
+      // Tab pin是为了讲chatBox的tab pin下来
       let tabId
       if (message.data.tabId) tabId = message.data.tabId
       else tabId = sender.tab.id
