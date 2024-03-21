@@ -1,23 +1,23 @@
 import '@picocss/pico'
+import { MarkGithubIcon } from '@primer/octicons-react'
 import { useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
+import { Tab, TabList, TabPanel, Tabs } from 'react-tabs'
+import 'react-tabs/style/react-tabs.css'
+import Browser from 'webextension-polyfill'
 import {
   defaultConfig,
   getPreferredLanguageKey,
   getUserConfig,
   setUserConfig,
 } from '../config/index.mjs'
-import { Tab, TabList, TabPanel, Tabs } from 'react-tabs'
-import 'react-tabs/style/react-tabs.css'
-import './styles.scss'
-import { MarkGithubIcon } from '@primer/octicons-react'
-import Browser from 'webextension-polyfill'
 import { useWindowTheme } from '../hooks/use-window-theme.mjs'
 import { isMobile } from '../utils/index.mjs'
-import { useTranslation } from 'react-i18next'
-import { GeneralPart } from './sections/GeneralPart'
-import { FeaturePages } from './sections/FeaturePages'
 import { AdvancedPart } from './sections/AdvancedPart'
+import { FeaturePages } from './sections/FeaturePages'
+import { GeneralPart } from './sections/GeneralPart'
 import { ModulesPart } from './sections/ModulesPart'
+import './styles.scss'
 
 // eslint-disable-next-line react/prop-types
 function Footer({ currentVersion, latestVersion }) {
@@ -70,12 +70,15 @@ function Popup() {
   }
 
   useEffect(() => {
+    // changeLanguage
     getPreferredLanguageKey().then((lang) => {
       i18n.changeLanguage(lang)
     })
+
     getUserConfig().then((config) => {
       setConfig(config)
       setCurrentVersion(Browser.runtime.getManifest().version.replace('v', ''))
+      // 访问 github api来获取最新的版本号
       fetch('https://api.github.com/repos/josstorer/chatGPTBox/releases/latest').then((response) =>
         response.json().then((data) => {
           setLatestVersion(data.tag_name.replace('v', ''))
@@ -84,6 +87,7 @@ function Popup() {
     })
   }, [])
 
+  // 变更theme
   useEffect(() => {
     document.documentElement.dataset.theme = config.themeMode === 'auto' ? theme : config.themeMode
   }, [config.themeMode, theme])
@@ -92,8 +96,10 @@ function Popup() {
   const popup = !isMobile() && search.get('popup') // manifest v2
 
   return (
+    // popup-mode 和 page-mode 只是class不一样
     <div className={popup === 'true' ? 'container-popup-mode' : 'container-page-mode'}>
       <form style="width:100%;">
+        {/* 这里用的是 react-tabs */}
         <Tabs selectedTabClassName="popup-tab--selected">
           <TabList>
             <Tab className="popup-tab">{t('General')}</Tab>
