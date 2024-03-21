@@ -1,14 +1,19 @@
+import { changeLanguage, t } from 'i18next'
 import Browser from 'webextension-polyfill'
 import { defaultConfig, getPreferredLanguageKey } from '../config/index.mjs'
-import { changeLanguage, t } from 'i18next'
 import { config as menuConfig } from '../content-script/menu-tools/index.mjs'
 
+// 目前看只在backgroud加载的时候运行一次
 export function refreshMenu() {
   Browser.contextMenus.removeAll().then(async () => {
     await getPreferredLanguageKey().then((lang) => {
       changeLanguage(lang)
     })
     const menuId = 'ChatGPTBox-Menu'
+
+    //这里的contextMenus分两部分
+    //contexts 属性用于定义上下文菜单项将在哪些类型的页面上可用
+    // 1. 右键的contextMenus: contexts: ['all']
     Browser.contextMenus.create({
       id: menuId,
       title: 'ChatGPTBox',
@@ -23,11 +28,12 @@ export function refreshMenu() {
         contexts: ['all'],
       })
     }
+    // 2. 选中的contextMenus ：selectionTool contexts: ['selection']
     Browser.contextMenus.create({
       id: menuId + 'separator1',
       parentId: menuId,
       contexts: ['selection'],
-      type: 'separator',
+      type: 'separator', //注意这里的type
     })
     for (const index in defaultConfig.selectionTools) {
       const key = defaultConfig.selectionTools[index]
@@ -40,6 +46,7 @@ export function refreshMenu() {
       })
     }
 
+    // 为context Menu设置点击事件
     Browser.contextMenus.onClicked.addListener((info, tab) => {
       Browser.tabs.query({ active: true, currentWindow: true }).then((tabs) => {
         const currentTab = tabs[0]
@@ -56,6 +63,7 @@ export function refreshMenu() {
             data: message,
           })
         } else if (message.itemId in menuConfig) {
+          //常见的几个menu item触发action
           if (menuConfig[message.itemId].action) {
             menuConfig[message.itemId].action(true, tab)
           }
