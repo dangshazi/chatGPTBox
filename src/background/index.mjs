@@ -44,9 +44,16 @@ import {
   getClaudeSessionKey,
   registerPortListener,
 } from '../services/wrappers.mjs'
+import { isChrome } from '../utils/is-chrome.mjs'
 import { openUrl } from '../utils/open-url.mjs'
 import { registerCommands } from './commands.mjs'
 import { refreshMenu } from './menus.mjs'
+
+if (isChrome()) {
+  chrome.sidePanel
+    .setPanelBehavior({ openPanelOnActionClick: true })
+    .catch((error) => console.error(error))
+}
 
 function setPortProxy(port, proxyTabId) {
   // set proxy for port

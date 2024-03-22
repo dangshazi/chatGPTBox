@@ -1,6 +1,6 @@
-import { getCoreContentText } from '../../utils/get-core-content-text'
 import Browser from 'webextension-polyfill'
 import { getUserConfig } from '../../config/index.mjs'
+import { getCoreContentText } from '../../utils/get-core-content-text'
 import { openUrl } from '../../utils/open-url'
 
 // config list
