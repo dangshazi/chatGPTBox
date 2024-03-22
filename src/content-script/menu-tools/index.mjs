@@ -3,6 +3,7 @@ import Browser from 'webextension-polyfill'
 import { getUserConfig } from '../../config/index.mjs'
 import { openUrl } from '../../utils/open-url'
 
+// config list
 export const config = {
   newChat: {
     label: 'New Chat',
@@ -60,6 +61,7 @@ export const config = {
   openSidePanel: {
     label: 'Open Side Panel',
     action: async (fromBackground, tab) => {
+      console.info('Open Side Panel')
       console.debug('action is from background', fromBackground)
       if (fromBackground) {
         // eslint-disable-next-line no-undef

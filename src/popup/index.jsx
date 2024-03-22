@@ -6,6 +6,7 @@ import { config as menuConfig } from '../content-script/menu-tools/index.mjs'
 import Browser from 'webextension-polyfill'
 
 getUserConfig().then(async (config) => {
+  //
   if (config.clickIconAction === 'popup' || (window.innerWidth > 100 && window.innerHeight > 100)) {
     render(<Popup />, document.getElementById('app'))
   } else {
@@ -30,6 +31,6 @@ getUserConfig().then(async (config) => {
         })
       }
     }
-    window.close()
+    // window.close()
   }
 })
