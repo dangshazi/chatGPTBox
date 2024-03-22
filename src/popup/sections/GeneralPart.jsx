@@ -159,6 +159,7 @@ export function GeneralPart({ config, updateConfig }) {
           >
             {config.activeApiModes.map((modelName) => {
               let desc
+              // 这里对'-'做了处理 为了处理ModelMode
               if (modelName.includes('-')) {
                 const splits = modelName.split('-')
                 if (splits[0] in Models)
@@ -382,6 +383,7 @@ export function GeneralPart({ config, updateConfig }) {
             else lang = preferredLanguageKey
             i18n.changeLanguage(lang)
 
+            // 为什么要通知所有页面？
             Browser.tabs.query({}).then((tabs) => {
               tabs.forEach((tab) => {
                 Browser.tabs

@@ -65,6 +65,7 @@ function Popup() {
   const theme = useWindowTheme()
 
   const updateConfig = async (value) => {
+    // 这里保存了两份配置，一份是默认的配置，一份是UserConfig
     setConfig({ ...config, ...value })
     await setUserConfig(value)
   }

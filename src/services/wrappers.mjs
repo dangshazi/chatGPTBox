@@ -9,6 +9,13 @@ import {
 import Browser from 'webextension-polyfill'
 import { t } from 'i18next'
 
+/**
+ * Retrieves or generates a GPT access token for the chat application.
+ *
+ * two ways to get token: 1. get from user config 2. get from cookies
+ *
+ * @return {string} The GPT access token.
+ */
 export async function getChatGptAccessToken() {
   await clearOldAccessToken()
   const userConfig = await getUserConfig()
@@ -92,6 +99,14 @@ export function handlePortError(session, port, err) {
   }
 }
 
+/**
+ * This method is used by service worker.
+ *
+ * Registers a listener for the port connection and sets up message and disconnect handlers.
+ *
+ * @param {function} executor - The function to execute when a message is received on the port
+ * @return {void}
+ */
 export function registerPortListener(executor) {
   Browser.runtime.onConnect.addListener((port) => {
     console.debug('connected')
@@ -102,6 +117,7 @@ export function registerPortListener(executor) {
       const config = await getUserConfig()
       if (!session.modelName) session.modelName = config.modelName
       if (!session.aiName) session.aiName = Models[session.modelName].desc
+      // 为什么要把session发回去？
       port.postMessage({ session })
       try {
         await executor(session, port, config)

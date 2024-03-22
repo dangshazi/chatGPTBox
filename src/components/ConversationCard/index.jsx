@@ -45,6 +45,7 @@ class ConversationItemData extends Object {
 function ConversationCard(props) {
   const { t } = useTranslation()
   const [isReady, setIsReady] = useState(!props.question)
+  // content-script connect to background
   const [port, setPort] = useState(() => Browser.runtime.connect())
   const [session, setSession] = useState(props.session)
   const windowSize = useClampWindowSize([750, 1500], [250, 1100])

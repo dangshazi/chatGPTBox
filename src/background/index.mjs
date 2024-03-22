@@ -49,16 +49,20 @@ import { registerCommands } from './commands.mjs'
 import { refreshMenu } from './menus.mjs'
 
 function setPortProxy(port, proxyTabId) {
+  // set proxy for port
   port.proxy = Browser.tabs.connect(proxyTabId)
+  // chatgpt page 发送过来的消息转发给proxy
   const proxyOnMessage = (msg) => {
     port.postMessage(msg)
   }
   const portOnMessage = (msg) => {
     port.proxy.postMessage(msg)
   }
+  // 与chatgpt page链接断了之后要重新连
   const proxyOnDisconnect = () => {
     port.proxy = Browser.tabs.connect(proxyTabId)
   }
+  // port的链接断了之后也没必要维持与chatgpt page的链接
   const portOnDisconnect = () => {
     port.proxy.onMessage.removeListener(proxyOnMessage)
     port.onMessage.removeListener(portOnMessage)
@@ -73,6 +77,9 @@ function setPortProxy(port, proxyTabId) {
 
 async function executeApi(session, port, config) {
   console.debug('modelName', session.modelName)
+
+  // 1. chatgpt-web
+  // port发来的所有消息本质上都被转发给了chatgpt页面
   if (chatgptWebModelKeys.includes(session.modelName)) {
     let tabId
     if (
@@ -82,16 +89,19 @@ async function executeApi(session, port, config) {
       const tab = await Browser.tabs.get(config.chatgptTabId).catch(() => {})
       if (tab) tabId = tab.id
     }
+    // 如果能找到chatgptTabId就用chatgptTabId
     if (tabId) {
       if (!port.proxy) {
         setPortProxy(port, tabId)
         port.proxy.postMessage({ session })
       }
     } else {
+      // 如果找不到chatgptTabId就用cookie中的accessToken
       const accessToken = await getChatGptAccessToken()
       await generateAnswersWithChatgptWebApi(port, session.question, session, accessToken)
     }
   } else if (
+    // 2. bing-web
     // `.some` for multi mode models. e.g. bingFree4-balanced
     bingWebModelKeys.some((n) => session.modelName.includes(n))
   ) {
@@ -100,6 +110,7 @@ async function executeApi(session, port, config) {
       await generateAnswersWithBingWebApi(port, session.question, session, accessToken, true)
     else await generateAnswersWithBingWebApi(port, session.question, session, accessToken)
   } else if (gptApiModelKeys.includes(session.modelName)) {
+    // 3. gpt-api 应该是老版的几个模型
     await generateAnswersWithGptCompletionApi(
       port,
       session.question,
@@ -108,6 +119,7 @@ async function executeApi(session, port, config) {
       session.modelName,
     )
   } else if (chatgptApiModelKeys.includes(session.modelName)) {
+    // 4. chatgpt-api 这个理解起来最简单
     await generateAnswersWithChatgptApi(
       port,
       session.question,
@@ -173,7 +185,8 @@ async function executeApi(session, port, config) {
   }
 }
 
-// 传递消息的主要处理逻辑
+// 传递消息的主要处理逻辑 ：监听来自其他上下文（如内容脚本或弹出窗口）发送的消息
+// 这里的消息是临时的内容，用来传递动作/操作给background
 Browser.runtime.onMessage.addListener(async (message, sender) => {
   switch (message.type) {
     case 'FEEDBACK': {
@@ -267,6 +280,7 @@ Browser.runtime.onMessage.addListener(async (message, sender) => {
 })
 
 try {
+  // open-ai related:获取arkose的req url和form
   Browser.webRequest.onBeforeRequest.addListener(
     (details) => {
       if (
@@ -294,6 +308,7 @@ try {
     ['requestBody'],
   )
 
+  // bing: refactor headers
   Browser.webRequest.onBeforeSendHeaders.addListener(
     (details) => {
       const headers = details.requestHeaders
@@ -313,6 +328,7 @@ try {
     ['requestHeaders'],
   )
 
+  // side panel
   Browser.tabs.onUpdated.addListener(async (tabId, info, tab) => {
     if (!tab.url) return
     // eslint-disable-next-line no-undef
@@ -326,6 +342,7 @@ try {
   console.log(error)
 }
 
+//注意：这里的链接是持久链接，用于传输对话内容
 registerPortListener(async (session, port, config) => await executeApi(session, port, config))
 registerCommands()
 refreshMenu()
