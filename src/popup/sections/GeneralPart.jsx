@@ -41,6 +41,7 @@ async function checkBilling(apiKey, apiUrl) {
   const subDate = new Date(now)
   subDate.setDate(1)
 
+  // API 已经废弃
   const urlSubscription = `${apiUrl}/v1/dashboard/billing/subscription`
   let urlUsage = `${apiUrl}/v1/dashboard/billing/usage?start_date=${formatDate(
     startDate,
@@ -84,6 +85,7 @@ export function GeneralPart({ config, updateConfig }) {
   const [balance, setBalance] = useState(null)
 
   const getBalance = async () => {
+    // API 已经废弃
     const response = await fetch(`${config.customOpenAiApiUrl}/dashboard/billing/credit_grants`, {
       headers: {
         'Content-Type': 'application/json',

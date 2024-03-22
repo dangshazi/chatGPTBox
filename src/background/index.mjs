@@ -44,7 +44,7 @@ import {
   getClaudeSessionKey,
   registerPortListener,
 } from '../services/wrappers.mjs'
-import { openUrl } from '../utils/open-url'
+import { openUrl } from '../utils/open-url.mjs'
 import { registerCommands } from './commands.mjs'
 import { refreshMenu } from './menus.mjs'
 
