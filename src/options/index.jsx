@@ -3,7 +3,7 @@ import { render } from 'preact'
 import Browser from 'webextension-polyfill'
 import '../_locales/i18n-react'
 import { getPreferredLanguageKey } from '../config/index.mjs'
-import App from './App'
+import Settings from './Settings'
 
 document.body.style.margin = 0
 document.body.style.overflow = 'hidden'
@@ -16,4 +16,4 @@ Browser.runtime.onMessage.addListener(async (message) => {
     changeLanguage(data.lang)
   }
 })
-render(<App />, document.getElementById('app'))
+render(<Settings />, document.getElementById('app'))
