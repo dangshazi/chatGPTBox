@@ -57,6 +57,10 @@ async function runWebpack(isWithoutKatex, isWithoutTiktoken, minimal, callback) 
         import: './src/popup/index.jsx',
         dependOn: 'shared',
       },
+      options: {
+        import: './src/options/index.jsx',
+        dependOn: 'shared',
+      },
       IndependentPanel: {
         import: './src/pages/IndependentPanel/index.jsx',
         dependOn: 'shared',
@@ -319,6 +323,8 @@ async function finishOutput(outputDirSuffix) {
     { src: 'build/popup.css', dst: 'popup.css' },
     { src: 'src/popup/index.html', dst: 'popup.html' },
 
+    { src: 'build/options.js', dst: 'options.js' },
+    { src: 'src/options/index.html', dst: 'options.html' },
     { src: 'build/IndependentPanel.js', dst: 'IndependentPanel.js' },
     { src: 'src/pages/IndependentPanel/index.html', dst: 'IndependentPanel.html' },
   ]
