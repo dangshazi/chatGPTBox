@@ -6,7 +6,8 @@ import { Box, Container, Tab, Tabs } from '@mui/material'
 import useTabs from '../hooks/useTabs'
 // _mock_
 
-import Iconify from '../components/Common/Iconify'
+import Iconify from '../components/Iconify'
+import NotistackProvider from '../components/NotistackProvider'
 
 // sections
 // import {
@@ -17,7 +18,7 @@ import Iconify from '../components/Common/Iconify'
 //   AccountSocialLinks,
 // } from 'sections'
 
-import { AccountGeneral } from './sections/AccountGeneral'
+import AccountGeneral from './account/AccountGeneral'
 
 // ----------------------------------------------------------------------
 
@@ -59,32 +60,34 @@ export default function UserAccount() {
   ]
 
   return (
-    <Container>
-      <div> Settings</div>
-      <Tabs
-        allowScrollButtonsMobile
-        variant="scrollable"
-        scrollButtons="auto"
-        value={currentTab}
-        onChange={onChangeTab}
-      >
-        {ACCOUNT_TABS.map((tab) => (
-          <Tab
-            disableRipple
-            key={tab.value}
-            label={capitalCase(tab.value)}
-            icon={tab.icon}
-            value={tab.value}
-          />
-        ))}
-      </Tabs>
+    <NotistackProvider>
+      <Container>
+        <div> Settings</div>
+        <Tabs
+          allowScrollButtonsMobile
+          variant="scrollable"
+          scrollButtons="auto"
+          value={currentTab}
+          onChange={onChangeTab}
+        >
+          {ACCOUNT_TABS.map((tab) => (
+            <Tab
+              disableRipple
+              key={tab.value}
+              label={capitalCase(tab.value)}
+              icon={tab.icon}
+              value={tab.value}
+            />
+          ))}
+        </Tabs>
 
-      <Box sx={{ mb: 5 }} />
+        <Box sx={{ mb: 5 }} />
 
-      {ACCOUNT_TABS.map((tab) => {
-        const isMatched = tab.value === currentTab
-        return isMatched && <Box key={tab.value}>{tab.component}</Box>
-      })}
-    </Container>
+        {ACCOUNT_TABS.map((tab) => {
+          const isMatched = tab.value === currentTab
+          return isMatched && <Box key={tab.value}>{tab.component}</Box>
+        })}
+      </Container>
+    </NotistackProvider>
   )
 }
