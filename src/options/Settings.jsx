@@ -4,10 +4,14 @@ import { Box, Container, Tab, Tabs } from '@mui/material'
 
 // hooks
 import useTabs from '../hooks/useTabs'
-// _mock_
 
 import Iconify from '../components/Iconify'
 import NotistackProvider from '../components/NotistackProvider'
+import ThemeColorPresets from '../components/ThemeColorPresets'
+import ThemeLocalization from '../components/ThemeLocalization'
+
+// theme
+import ThemeProvider from '../theme'
 
 // sections
 // import {
@@ -60,34 +64,40 @@ export default function UserAccount() {
   ]
 
   return (
-    <NotistackProvider>
-      <Container>
-        <div> Settings</div>
-        <Tabs
-          allowScrollButtonsMobile
-          variant="scrollable"
-          scrollButtons="auto"
-          value={currentTab}
-          onChange={onChangeTab}
-        >
-          {ACCOUNT_TABS.map((tab) => (
-            <Tab
-              disableRipple
-              key={tab.value}
-              label={capitalCase(tab.value)}
-              icon={tab.icon}
-              value={tab.value}
-            />
-          ))}
-        </Tabs>
+    <ThemeProvider>
+      <ThemeColorPresets>
+        <ThemeLocalization>
+          <NotistackProvider>
+            <Container>
+              <div> Settings</div>
+              <Tabs
+                allowScrollButtonsMobile
+                variant="scrollable"
+                scrollButtons="auto"
+                value={currentTab}
+                onChange={onChangeTab}
+              >
+                {ACCOUNT_TABS.map((tab) => (
+                  <Tab
+                    disableRipple
+                    key={tab.value}
+                    label={capitalCase(tab.value)}
+                    icon={tab.icon}
+                    value={tab.value}
+                  />
+                ))}
+              </Tabs>
 
-        <Box sx={{ mb: 5 }} />
+              <Box sx={{ mb: 5 }} />
 
-        {ACCOUNT_TABS.map((tab) => {
-          const isMatched = tab.value === currentTab
-          return isMatched && <Box key={tab.value}>{tab.component}</Box>
-        })}
-      </Container>
-    </NotistackProvider>
+              {ACCOUNT_TABS.map((tab) => {
+                const isMatched = tab.value === currentTab
+                return isMatched && <Box key={tab.value}>{tab.component}</Box>
+              })}
+            </Container>
+          </NotistackProvider>
+        </ThemeLocalization>
+      </ThemeColorPresets>
+    </ThemeProvider>
   )
 }
