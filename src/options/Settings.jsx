@@ -1,6 +1,6 @@
 import { capitalCase } from 'change-case'
 // @mui
-import { Box, Container, Tab, Tabs } from '@mui/material'
+import { Box, Card, Container, Tab, Tabs, Typography } from '@mui/material'
 
 // hooks
 import useTabs from '../hooks/useTabs'
@@ -22,18 +22,14 @@ import ThemeProvider from '../theme'
 //   AccountSocialLinks,
 // } from 'sections'
 
-import AccountProfile from './account/AccountProfile'
 import AccountNotifications from './account/AccountNotifications'
+import AccountProfile from './account/AccountProfile'
 
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import {
-  defaultConfig,
-  getPreferredLanguageKey,
-  setUserConfig
-} from '../config/index.mjs'
+import { defaultConfig, getPreferredLanguageKey, setUserConfig } from '../config/index.mjs'
 
-import { GeneralPart } from '../popup/sections/GeneralPart'
+import { GeneralPart } from './sections/GeneralPart'
 
 // ----------------------------------------------------------------------
 
@@ -114,7 +110,13 @@ export default function UserAccount() {
         <ThemeLocalization>
           <NotistackProvider>
             <Container>
-              <div> Settings</div>
+              <Box sx={{ mb: 5 }} />
+              <Card>
+                <Typography display="flex" alignItems="center" variant="h4" sx={{ margin: 2 }}>
+                  <Iconify icon={'eva:settings-fill'} sx={{ fontSize: 30 }} />
+                  {t('Settings')}
+                </Typography>
+              </Card>
               <Tabs
                 allowScrollButtonsMobile
                 variant="scrollable"
