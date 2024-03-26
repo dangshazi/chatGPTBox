@@ -2,10 +2,10 @@ import { useSnackbar } from 'notistack';
 // form
 import { useForm } from 'react-hook-form';
 // @mui
-import { Card, Stack, Typography } from '@mui/material';
-import { LoadingButton } from '@mui/lab';
+import { LoadingButton } from '@mui/lab'
+import { Card, Stack, Typography } from '@mui/material'
 // components
-import { FormProvider, RHFSwitch } from '../../../../components/hook-form';
+import { FormProvider, RHFSwitch } from '../../components/hook-form'
 
 // ----------------------------------------------------------------------
 

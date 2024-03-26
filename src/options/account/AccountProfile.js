@@ -1,31 +1,37 @@
-import * as Yup from 'yup';
-import { useSnackbar } from 'notistack';
-import { useCallback } from 'react';
+import { useSnackbar } from 'notistack'
+import { useCallback } from 'react'
+import * as Yup from 'yup'
 // form
-import { useForm } from 'react-hook-form';
-import { yupResolver } from '@hookform/resolvers/yup';
+import { yupResolver } from '@hookform/resolvers/yup'
+import { useForm } from 'react-hook-form'
 // @mui
-import { Box, Grid, Card, Stack, Typography } from '@mui/material';
-import { LoadingButton } from '@mui/lab';
+import { LoadingButton } from '@mui/lab'
+import { Box, Card, Grid, Stack, Typography } from '@mui/material'
 // hooks
-import useAuth from '../../hooks/useAuth';
+import useAuth from '../../hooks/useAuth'
 // utils
-import { fData } from '../../utils/formatNumber';
+import { fData } from '../../utils/formatNumber'
 // _mock
-import { countries } from '../../_mock';
+import { countries } from '../../_mock'
 // components
-import { FormProvider, RHFSelect, RHFSwitch, RHFTextField, RHFUploadAvatar } from '../../components/hook-form';
+import {
+  FormProvider,
+  RHFSelect,
+  RHFSwitch,
+  RHFTextField,
+  RHFUploadAvatar,
+} from '../../components/hook-form'
 
 // ----------------------------------------------------------------------
 
-export default function AccountGeneral() {
-  const { enqueueSnackbar } = useSnackbar();
+export default function AccountProfile() {
+  const { enqueueSnackbar } = useSnackbar()
 
-  const { user } = useAuth();
+  const { user } = useAuth()
 
   const UpdateUserSchema = Yup.object().shape({
     displayName: Yup.string().required('Name is required'),
-  });
+  })
 
   const defaultValues = {
     displayName: user?.displayName || '',
@@ -39,43 +45,43 @@ export default function AccountGeneral() {
     zipCode: user?.zipCode || '',
     about: user?.about || '',
     isPublic: user?.isPublic || false,
-  };
+  }
 
   const methods = useForm({
     resolver: yupResolver(UpdateUserSchema),
     defaultValues,
-  });
+  })
 
   const {
     setValue,
     handleSubmit,
     formState: { isSubmitting },
-  } = methods;
+  } = methods
 
   const onSubmit = async () => {
     try {
-      await new Promise((resolve) => setTimeout(resolve, 500));
-      enqueueSnackbar('Update success!');
+      await new Promise((resolve) => setTimeout(resolve, 500))
+      enqueueSnackbar('Update success!')
     } catch (error) {
-      console.error(error);
+      console.error(error)
     }
-  };
+  }
 
   const handleDrop = useCallback(
     (acceptedFiles) => {
-      const file = acceptedFiles[0];
+      const file = acceptedFiles[0]
 
       if (file) {
         setValue(
           'photoURL',
           Object.assign(file, {
             preview: URL.createObjectURL(file),
-          })
-        );
+          }),
+        )
       }
     },
-    [setValue]
-  );
+    [setValue],
+  )
 
   return (
     <FormProvider methods={methods} onSubmit={handleSubmit(onSubmit)}>
@@ -104,7 +110,12 @@ export default function AccountGeneral() {
               }
             />
 
-            <RHFSwitch name="isPublic" labelPlacement="start" label="Public Profile" sx={{ mt: 5 }} />
+            <RHFSwitch
+              name="isPublic"
+              labelPlacement="start"
+              label="Public Profile"
+              sx={{ mt: 5 }}
+            />
           </Card>
         </Grid>
 
@@ -150,5 +161,5 @@ export default function AccountGeneral() {
         </Grid>
       </Grid>
     </FormProvider>
-  );
+  )
 }

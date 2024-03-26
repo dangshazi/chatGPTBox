@@ -22,18 +22,63 @@ import ThemeProvider from '../theme'
 //   AccountSocialLinks,
 // } from 'sections'
 
-import AccountGeneral from './account/AccountGeneral'
+import AccountProfile from './account/AccountProfile'
+import AccountNotifications from './account/AccountNotifications'
+
+import { useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
+import {
+  defaultConfig,
+  getPreferredLanguageKey,
+  setUserConfig
+} from '../config/index.mjs'
+
+import { GeneralPart } from '../popup/sections/GeneralPart'
 
 // ----------------------------------------------------------------------
 
 export default function UserAccount() {
   const { currentTab, onChangeTab } = useTabs('general')
+  const [config, setConfig] = useState(defaultConfig)
+  // const [currentVersion, setCurrentVersion] = useState('')
+  // const [latestVersion, setLatestVersion] = useState('')
+
+  const { t, i18n } = useTranslation()
+  const updateConfig = (value) => {
+    // 这里保存了两份配置，一份是默认的配置，一份是UserConfig
+    setConfig({ ...config, ...value })
+    setUserConfig(value)
+  }
+
+  useEffect(() => {
+    // changeLanguage
+    getPreferredLanguageKey().then((lang) => {
+      i18n.changeLanguage(lang)
+    })
+
+    // getUserConfig().then((config) => {
+    //   setConfig(config)
+    //   setCurrentVersion(Browser.runtime.getManifest().version.replace('v', ''))
+    //   // 访问 github api来获取最新的版本号
+    //   fetch('https://api.github.com/repos/josstorer/chatGPTBox/releases/latest').then((response) =>
+    //     response.json().then((data) => {
+    //       setLatestVersion(data.tag_name.replace('v', ''))
+    //     }),
+    //   )
+    // })
+  }, [])
 
   const ACCOUNT_TABS = [
     {
       value: 'general',
       icon: <Iconify icon={'ic:round-account-box'} width={20} height={20} />,
-      component: <AccountGeneral />,
+      component: <AccountProfile />,
+    },
+
+    {
+      value: 'config',
+      icon: <Iconify icon={'ic:round-account-box'} width={20} height={20} />,
+      component: <GeneralPart config={config} updateConfig={updateConfig} />,
     },
     // {
     //   value: 'billing',
@@ -46,11 +91,11 @@ export default function UserAccount() {
     //     />
     //   ),
     // },
-    // {
-    //   value: 'notifications',
-    //   icon: <Iconify icon={'eva:bell-fill'} width={20} height={20} />,
-    //   component: <AccountNotifications />,
-    // },
+    {
+      value: 'notifications',
+      icon: <Iconify icon={'eva:bell-fill'} width={20} height={20} />,
+      component: <AccountNotifications />,
+    },
     // {
     //   value: 'social_links',
     //   icon: <Iconify icon={'eva:share-fill'} width={20} height={20} />,
