@@ -35,10 +35,7 @@
   "browser_action": {
     "default_popup": "popup.html?popup=true"
   },
-  "options_ui": {
-    "page": "options.html",
-    "open_in_tab": true
-  },
+  "options_page": "options.html",
   "content_scripts": [
     {
       "matches": [

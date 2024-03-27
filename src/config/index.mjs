@@ -399,7 +399,17 @@ export async function getUserConfig() {
  * @param {Partial<UserConfig>} value
  */
 export async function setUserConfig(value) {
-  await Browser.storage.local.set(value)
+  await Browser.storage.local
+    .set(value)
+    .then(() => {
+      var ls = Browser.storage.local.get()
+      ls.then((o) => {
+        console.log(o)
+      })
+    })
+    .catch((error) => {
+      console.error('Error storing data: ', error)
+    })
 }
 
 export async function setAccessToken(accessToken) {

@@ -22,8 +22,8 @@ import { config as menuConfig } from '../../content-script/menu-tools'
 import { openUrl } from '../../utils/index.mjs'
 
 import { Card, Grid, MenuItem, Select, Stack } from '@mui/material'
-import InputLabel from '@mui/material/InputLabel'
 import FormControl from '@mui/material/FormControl'
+import InputLabel from '@mui/material/InputLabel'
 
 GeneralPart.propTypes = {
   config: PropTypes.object.isRequired,
@@ -114,6 +114,127 @@ export function GeneralPart({ config, updateConfig }) {
         <Card>
           <Stack spacing={2} direction="column" sx={{ p: 3 }}>
             <FormControl>
+              <InputLabel id="theme">{t('Theme')}</InputLabel>
+              <Select
+                fullWidth
+                labelId="theme"
+                name="theme"
+                label="Theme"
+                // InputLabelProps={{ shrink: true }}
+                // SelectProps={{ native: false, sx: { textTransform: 'capitalize' } }}
+                onChange={(e) => {
+                  const mode = e.target.value
+                  updateConfig({ themeMode: mode })
+                }}
+                value={config.themeMode}
+              >
+                {Object.entries(ThemeMode).map(([key, desc]) => {
+                  return (
+                    <MenuItem
+                      key={key}
+                      value={key}
+                      sx={{
+                        mx: 1,
+                        my: 0.5,
+                        borderRadius: 0.75,
+                        typography: 'body2',
+                        // textTransform: 'capitalize',
+                      }}
+                    >
+                      {t(desc)}
+                    </MenuItem>
+                  )
+                })}
+              </Select>
+            </FormControl>
+            <FormControl>
+              <InputLabel id="language">{t('Preferred Language')}</InputLabel>
+              <Select
+                fullWidth
+                labelId="language"
+                name="language"
+                label="Language"
+                // InputLabelProps={{ shrink: true }}
+                // SelectProps={{ native: false, sx: { textTransform: 'capitalize' } }}
+                onChange={(e) => {
+                  const preferredLanguageKey = e.target.value
+                  updateConfig({ preferredLanguage: preferredLanguageKey })
+
+                  let lang
+                  if (preferredLanguageKey === 'auto') lang = config.userLanguage
+                  else lang = preferredLanguageKey
+                  i18n.changeLanguage(lang)
+
+                  // 为什么要通知所有页面？
+                  Browser.tabs.query({}).then((tabs) => {
+                    tabs.forEach((tab) => {
+                      Browser.tabs
+                        .sendMessage(tab.id, {
+                          type: 'CHANGE_LANG',
+                          data: {
+                            lang,
+                          },
+                        })
+                        .catch(() => {})
+                    })
+                  })
+                }}
+                value={config.preferredLanguage}
+              >
+                {Object.entries(languageList).map(([key, desc]) => {
+                  return (
+                    <MenuItem
+                      key={key}
+                      value={key}
+                      sx={{
+                        mx: 1,
+                        my: 0.5,
+                        borderRadius: 0.75,
+                        typography: 'body2',
+                        // textTransform: 'capitalize',
+                      }}
+                    >
+                      {t(desc.native)}
+                    </MenuItem>
+                  )
+                })}
+              </Select>
+            </FormControl>
+            <FormControl>
+              <InputLabel id="triggers">{t('Triggers')}</InputLabel>
+              <Select
+                fullWidth
+                labelId="triggers"
+                name="triggers"
+                label="Triggers"
+                // InputLabelProps={{ shrink: true }}
+                // SelectProps={{ native: false, sx: { textTransform: 'capitalize' } }}
+                onChange={(e) => {
+                  const mode = e.target.value
+                  updateConfig({ triggerMode: mode })
+                }}
+                value={config.triggerMode}
+              >
+                {Object.entries(TriggerMode).map(([key, desc]) => {
+                  return (
+                    <MenuItem
+                      key={key}
+                      value={key}
+                      sx={{
+                        mx: 1,
+                        my: 0.5,
+                        borderRadius: 0.75,
+                        typography: 'body2',
+                        // textTransform: 'capitalize',
+                      }}
+                    >
+                      {t(desc)}
+                    </MenuItem>
+                  )
+                })}
+              </Select>
+            </FormControl>
+            <FormControl>
               <InputLabel id="default-model">Default Model</InputLabel>
               <Select
                 fullWidth
@@ -152,7 +273,7 @@ export function GeneralPart({ config, updateConfig }) {
                           // textTransform: 'capitalize',
                         }}
                       >
-                        {modelName}
+                        {desc}
                       </MenuItem>
                     )
                 })}

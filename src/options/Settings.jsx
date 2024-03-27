@@ -135,7 +135,7 @@ export default function UserAccount() {
                 ))}
               </Tabs>
 
-              <Box sx={{ mb: 5 }} />
+              <Box sx={{ mb: 1 }} />
 
               {ACCOUNT_TABS.map((tab) => {
                 const isMatched = tab.value === currentTab
