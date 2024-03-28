@@ -36,7 +36,7 @@ import InputLabel from '@mui/material/InputLabel'
 import { config as toolsConfig } from '../../content-script/selection-tools/index.mjs'
 import { isFirefox, isMobile, isSafari, openUrl } from '../../utils/index.mjs'
 
-GeneralPart.propTypes = {
+GeneralConfig.propTypes = {
   config: PropTypes.object.isRequired,
   updateConfig: PropTypes.func.isRequired,
 }
@@ -95,7 +95,7 @@ async function checkBilling(apiKey, apiUrl) {
   }
 }
 
-export function GeneralPart({ config, updateConfig }) {
+export function GeneralConfig({ config, updateConfig }) {
   const { t, i18n } = useTranslation()
   const [balance, setBalance] = useState(null)
   const [currentModel, setCurrentModel] = useState(null)
@@ -571,7 +571,7 @@ export function GeneralPart({ config, updateConfig }) {
         <Card>
           <Stack spacing={2} direction="column" sx={{ p: 3 }}>
             <Typography variant="overline" sx={{ color: 'text.secondary' }}>
-              ChatWindow
+              Chat Window
             </Typography>
             <FormControlLabel
               control={
@@ -661,7 +661,7 @@ export function GeneralPart({ config, updateConfig }) {
               label={t('Regenerate the answer after switching model')}
             />
             <Typography variant="overline" sx={{ color: 'text.secondary' }}>
-              PageInjection
+              Page Injection
             </Typography>
             <FormControlLabel
               control={
@@ -694,7 +694,7 @@ export function GeneralPart({ config, updateConfig }) {
         <Card>
           <Stack spacing={2} direction="column" sx={{ p: 3 }}>
             <Typography variant="overline" sx={{ color: 'text.secondary' }}>
-              SelectionTool
+              Selection Tool
             </Typography>
             {config.selectionTools.map((key) => (
               <label key={key}>

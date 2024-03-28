@@ -29,7 +29,8 @@ import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { defaultConfig, getPreferredLanguageKey, setUserConfig } from '../config/index.mjs'
 
-import { GeneralPart } from './sections/GeneralPart'
+import { AdvancedConfig } from './sections/AdvancedConfig'
+import { GeneralConfig } from './sections/GeneralConfig'
 
 // ----------------------------------------------------------------------
 
@@ -72,9 +73,15 @@ export default function UserAccount() {
     },
 
     {
-      value: 'config',
+      value: 'general_config',
       icon: <Iconify icon={'ic:round-account-box'} width={20} height={20} />,
-      component: <GeneralPart config={config} updateConfig={updateConfig} />,
+      component: <GeneralConfig config={config} updateConfig={updateConfig} />,
+    },
+
+    {
+      value: 'advanced_config',
+      icon: <Iconify icon={'ic:round-account-box'} width={20} height={20} />,
+      component: <AdvancedConfig config={config} updateConfig={updateConfig} />,
     },
     // {
     //   value: 'billing',
