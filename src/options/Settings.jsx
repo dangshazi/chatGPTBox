@@ -22,7 +22,6 @@ import ThemeProvider from '../theme'
 //   AccountSocialLinks,
 // } from 'sections'
 
-import AccountNotifications from './account/AccountNotifications'
 import AccountProfile from './account/AccountProfile'
 
 import { useEffect, useState } from 'react'
@@ -31,6 +30,7 @@ import { defaultConfig, getPreferredLanguageKey, setUserConfig } from '../config
 
 import { AdvancedConfig } from './sections/AdvancedConfig'
 import { GeneralConfig } from './sections/GeneralConfig'
+import { SelectionToolConfig } from './sections/GptModelConfig'
 
 // ----------------------------------------------------------------------
 
@@ -69,19 +69,25 @@ export default function UserAccount() {
     {
       value: 'general',
       icon: <Iconify icon={'ic:round-account-box'} width={20} height={20} />,
-      component: <AccountProfile />,
-    },
-
-    {
-      value: 'general_config',
-      icon: <Iconify icon={'ic:round-account-box'} width={20} height={20} />,
       component: <GeneralConfig config={config} updateConfig={updateConfig} />,
     },
 
     {
-      value: 'advanced_config',
+      value: 'advanced',
       icon: <Iconify icon={'ic:round-account-box'} width={20} height={20} />,
       component: <AdvancedConfig config={config} updateConfig={updateConfig} />,
+    },
+
+    {
+      value: 'selection_tool',
+      icon: <Iconify icon={'ic:round-account-box'} width={20} height={20} />,
+      component: <SelectionToolConfig config={config} updateConfig={updateConfig} />,
+    },
+
+    {
+      value: 'account',
+      icon: <Iconify icon={'ic:round-account-box'} width={20} height={20} />,
+      component: <AccountProfile />,
     },
     // {
     //   value: 'billing',
@@ -94,11 +100,11 @@ export default function UserAccount() {
     //     />
     //   ),
     // },
-    {
-      value: 'notifications',
-      icon: <Iconify icon={'eva:bell-fill'} width={20} height={20} />,
-      component: <AccountNotifications />,
-    },
+    // {
+    //   value: 'notifications',
+    //   icon: <Iconify icon={'eva:bell-fill'} width={20} height={20} />,
+    //   component: <AccountNotifications />,
+    // },
     // {
     //   value: 'social_links',
     //   icon: <Iconify icon={'eva:share-fill'} width={20} height={20} />,
