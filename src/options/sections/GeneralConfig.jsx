@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types'
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import Browser from 'webextension-polyfill'
 import {
@@ -7,15 +7,15 @@ import {
   Models,
   ThemeMode,
   TriggerMode,
-  isSupportBalance,
-  isUsingApiKey,
   isUsingAzureOpenAi,
   isUsingChatGLMApi,
-  isUsingClaude2Api,
+  isUsingClaudeApi,
   isUsingCustomModel,
   isUsingCustomNameOnlyModel,
   isUsingGithubThirdPartyApi,
+  isUsingMoonshotApi,
   isUsingMultiModeModel,
+  isUsingOpenAiApiKey,
 } from '../../config/index.mjs'
 import { languageList } from '../../config/language.mjs'
 import { config as menuConfig } from '../../content-script/menu-tools'
@@ -98,7 +98,6 @@ async function checkBilling(apiKey, apiUrl) {
 export function GeneralConfig({ config, updateConfig }) {
   const { t, i18n } = useTranslation()
   const [balance, setBalance] = useState(null)
-  const [currentModel, setCurrentModel] = useState(null)
   const [backgroundPermission, setBackgroundPermission] = useState(false)
 
   if (!isMobile() && !isFirefox() && !isSafari()) {
@@ -106,9 +105,6 @@ export function GeneralConfig({ config, updateConfig }) {
       setBackgroundPermission(result)
     })
   }
-  const showBalance = useMemo(() => {
-    return isSupportBalance(config)
-  }, [config])
 
   const getBalance = async () => {
     // API 已经废弃
@@ -300,18 +296,17 @@ export function GeneralConfig({ config, updateConfig }) {
               </Select>
             </FormControl>
             <FormControl>
-              <InputLabel id="default-model">Default Model</InputLabel>
+              <InputLabel id="model">Model</InputLabel>
               <Select
                 fullWidth
-                labelId="default-model"
-                name="DefaultModel"
-                label="DefaultModel"
+                labelId="model"
+                name="Model"
+                label="Model"
                 // InputLabelProps={{ shrink: true }}
                 // SelectProps={{ native: false, sx: { textTransform: 'capitalize' } }}
                 onChange={(e) => {
                   const modelName = e.target.value
                   updateConfig({ modelName: modelName })
-                  setCurrentModel(Models[modelName])
                 }}
                 value={config.modelName}
               >
@@ -351,12 +346,13 @@ export function GeneralConfig({ config, updateConfig }) {
                 <span style="display: flex; gap: 15px;">
                   <select
                     style={
-                      isUsingApiKey(config) ||
+                      isUsingOpenAiApiKey(config) ||
                       isUsingMultiModeModel(config) ||
                       isUsingCustomModel(config) ||
                       isUsingAzureOpenAi(config) ||
-                      isUsingClaude2Api(config) ||
-                      isUsingCustomNameOnlyModel(config)
+                      isUsingClaudeApi(config) ||
+                      isUsingCustomNameOnlyModel(config) ||
+                      isUsingMoonshotApi(config)
                         ? 'width: 50%;'
                         : undefined
                     }
@@ -364,7 +360,6 @@ export function GeneralConfig({ config, updateConfig }) {
                     onChange={(e) => {
                       const modelName = e.target.value
                       updateConfig({ modelName: modelName })
-                      setCurrentModel(Models[modelName])
                     }}
                   >
                     {config.activeApiModes.map((modelName) => {
@@ -408,7 +403,7 @@ export function GeneralConfig({ config, updateConfig }) {
                       })}
                     </select>
                   )}
-                  {isUsingApiKey(config) && (
+                  {isUsingOpenAiApiKey(config) && (
                     <span style="width: 50%; display: flex; gap: 5px;">
                       <input
                         type="password"
@@ -421,11 +416,7 @@ export function GeneralConfig({ config, updateConfig }) {
                       />
                       {config.apiKey.length === 0 ? (
                         <a
-                          href={
-                            currentModel && 'keyGenerateUrl' in currentModel
-                              ? currentModel.keyGenerateUrl
-                              : 'https://platform.openai.com/account/api-keys'
-                          }
+                          href="https://platform.openai.com/account/api-keys"
                           target="_blank"
                           rel="nofollow noopener noreferrer"
                         >
@@ -433,17 +424,15 @@ export function GeneralConfig({ config, updateConfig }) {
                             {t('Get')}
                           </button>
                         </a>
-                      ) : showBalance ? (
-                        balance ? (
-                          <button type="button" onClick={getBalance}>
-                            {balance}
-                          </button>
-                        ) : (
-                          <button type="button" onClick={getBalance}>
-                            {t('Balance')}
-                          </button>
-                        )
-                      ) : null}
+                      ) : balance ? (
+                        <button type="button" onClick={getBalance}>
+                          {balance}
+                        </button>
+                      ) : (
+                        <button type="button" onClick={getBalance}>
+                          {t('Balance')}
+                        </button>
+                      )}
                     </span>
                   )}
                   {isUsingCustomModel(config) && (
@@ -482,7 +471,7 @@ export function GeneralConfig({ config, updateConfig }) {
                       }}
                     />
                   )}
-                  {isUsingClaude2Api(config) && (
+                  {isUsingClaudeApi(config) && (
                     <input
                       type="password"
                       style="width: 50%;"
@@ -505,6 +494,30 @@ export function GeneralConfig({ config, updateConfig }) {
                         updateConfig({ chatglmApiKey: apiKey })
                       }}
                     />
+                  )}
+                  {isUsingMoonshotApi(config) && (
+                    <span style="width: 50%; display: flex; gap: 5px;">
+                      <input
+                        type="password"
+                        value={config.moonshotApiKey}
+                        placeholder={t('Moonshot API Key')}
+                        onChange={(e) => {
+                          const apiKey = e.target.value
+                          updateConfig({ moonshotApiKey: apiKey })
+                        }}
+                      />
+                      {config.moonshotApiKey.length === 0 && (
+                        <a
+                          href="https://platform.moonshot.cn/console/api-keys"
+                          target="_blank"
+                          rel="nofollow noopener noreferrer"
+                        >
+                          <button style="white-space: nowrap;" type="button">
+                            {t('Get')}
+                          </button>
+                        </a>
+                      )}
+                    </span>
                   )}
                 </span>
                 {isUsingCustomModel(config) && (

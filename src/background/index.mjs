@@ -9,13 +9,13 @@ import {
   chatgptWebModelKeys,
   claudeApiModelKeys,
   claudeWebModelKeys,
-  moonshotWebModelKeys,
   customApiModelKeys,
   defaultConfig,
   getUserConfig,
   githubThirdPartyApiModelKeys,
   gptApiModelKeys,
   moonshotApiModelKeys,
+  moonshotWebModelKeys,
   poeWebModelKeys,
   setUserConfig,
 } from '../config/index.mjs'
@@ -32,11 +32,13 @@ import { generateAnswersWithClaudeApi } from '../services/apis/claude-api.mjs'
 import { generateAnswersWithClaudeWebApi } from '../services/apis/claude-web.mjs'
 import { generateAnswersWithCustomApi } from '../services/apis/custom-api.mjs'
 import { generateAnswersWithMoonshotCompletionApi } from '../services/apis/moonshot-api.mjs'
+import { generateAnswersWithMoonshotWebApi } from '../services/apis/moonshot-web.mjs'
 import {
   generateAnswersWithChatgptApi,
   generateAnswersWithGptCompletionApi,
 } from '../services/apis/openai-api'
 import { generateAnswersWithWaylaidwandererApi } from '../services/apis/waylaidwanderer-api.mjs'
+
 import {
   getBardCookies,
   getBingAccessToken,

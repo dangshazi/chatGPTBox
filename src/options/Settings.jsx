@@ -30,7 +30,7 @@ import { defaultConfig, getPreferredLanguageKey, setUserConfig } from '../config
 
 import { AdvancedConfig } from './sections/AdvancedConfig'
 import { GeneralConfig } from './sections/GeneralConfig'
-import { SelectionToolConfig } from './sections/GptModelConfig'
+import { GptModelConfig } from './sections/GptModelConfig'
 
 // ----------------------------------------------------------------------
 
@@ -79,9 +79,9 @@ export default function UserAccount() {
     },
 
     {
-      value: 'selection_tool',
+      value: 'gpt_model',
       icon: <Iconify icon={'ic:round-account-box'} width={20} height={20} />,
-      component: <SelectionToolConfig config={config} updateConfig={updateConfig} />,
+      component: <GptModelConfig config={config} updateConfig={updateConfig} />,
     },
 
     {
