@@ -198,7 +198,7 @@ export const defaultConfig = {
   modelName: 'chatgptFree35',
 
   preferredLanguage: getNavigatorLanguage(),
-  clickIconAction: 'popup',
+  clickIconAction: 'openSidePanel',
   insertAtTop: isMobile(),
   lockWhenAnswer: true,
   answerScrollMargin: 200,

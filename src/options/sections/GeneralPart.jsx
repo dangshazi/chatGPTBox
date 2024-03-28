@@ -19,11 +19,22 @@ import {
 } from '../../config/index.mjs'
 import { languageList } from '../../config/language.mjs'
 import { config as menuConfig } from '../../content-script/menu-tools'
-import { openUrl } from '../../utils/index.mjs'
 
-import { Card, Grid, MenuItem, Select, Stack } from '@mui/material'
+import {
+  Card,
+  FormControlLabel,
+  Grid,
+  MenuItem,
+  Select,
+  Stack,
+  Switch,
+  Typography,
+} from '@mui/material'
 import FormControl from '@mui/material/FormControl'
 import InputLabel from '@mui/material/InputLabel'
+
+import { config as toolsConfig } from '../../content-script/selection-tools/index.mjs'
+import { isFirefox, isMobile, isSafari, openUrl } from '../../utils/index.mjs'
 
 GeneralPart.propTypes = {
   config: PropTypes.object.isRequired,
@@ -88,6 +99,13 @@ export function GeneralPart({ config, updateConfig }) {
   const { t, i18n } = useTranslation()
   const [balance, setBalance] = useState(null)
   const [currentModel, setCurrentModel] = useState(null)
+  const [backgroundPermission, setBackgroundPermission] = useState(false)
+
+  if (!isMobile() && !isFirefox() && !isSafari()) {
+    Browser.permissions.contains({ permissions: ['background'] }).then((result) => {
+      setBackgroundPermission(result)
+    })
+  }
   const showBalance = useMemo(() => {
     return isSupportBalance(config)
   }, [config])
@@ -201,6 +219,53 @@ export function GeneralPart({ config, updateConfig }) {
               </Select>
             </FormControl>
             <FormControl>
+              <InputLabel id="clickIconAction">{t('When Icon Clicked')}</InputLabel>
+              <Select
+                fullWidth
+                labelId="clickIconAction"
+                name="clickIconAction"
+                label="ClickIconAction"
+                // InputLabelProps={{ shrink: true }}
+                // SelectProps={{ native: false, sx: { textTransform: 'capitalize' } }}
+                onChange={(e) => {
+                  const mode = e.target.value
+                  updateConfig({ clickIconAction: mode })
+                }}
+                value={config.clickIconAction}
+              >
+                <MenuItem
+                  key="popup"
+                  value="popup"
+                  sx={{
+                    mx: 1,
+                    my: 0.5,
+                    borderRadius: 0.75,
+                    typography: 'body2',
+                    // textTransform: 'capitalize',
+                  }}
+                >
+                  {t('Open Settings')}
+                </MenuItem>
+                {Object.entries(menuConfig).map(([key, desc]) => {
+                  return (
+                    <MenuItem
+                      key={key}
+                      value={key}
+                      sx={{
+                        mx: 1,
+                        my: 0.5,
+                        borderRadius: 0.75,
+                        typography: 'body2',
+                        // textTransform: 'capitalize',
+                      }}
+                    >
+                      {t(desc.label)}
+                    </MenuItem>
+                  )
+                })}
+              </Select>
+            </FormControl>
+            <FormControl>
               <InputLabel id="triggers">{t('Triggers')}</InputLabel>
               <Select
                 fullWidth
@@ -279,388 +344,379 @@ export function GeneralPart({ config, updateConfig }) {
                 })}
               </Select>
             </FormControl>
-            <label>
-              <legend>{t('Theme')}</legend>
-              <select
-                required
-                onChange={(e) => {
-                  const mode = e.target.value
-                  updateConfig({ themeMode: mode })
-                }}
-              >
-                {Object.entries(ThemeMode).map(([key, desc]) => {
-                  return (
-                    <option value={key} key={key} selected={key === config.themeMode}>
-                      {t(desc)}
-                    </option>
-                  )
-                })}
-              </select>
-            </label>
-
-            <label>
-              <legend>{t('Preferred Language')}</legend>
-              <select
-                required
-                onChange={(e) => {
-                  const preferredLanguageKey = e.target.value
-                  updateConfig({ preferredLanguage: preferredLanguageKey })
-
-                  let lang
-                  if (preferredLanguageKey === 'auto') lang = config.userLanguage
-                  else lang = preferredLanguageKey
-                  i18n.changeLanguage(lang)
-
-                  // 为什么要通知所有页面？
-                  Browser.tabs.query({}).then((tabs) => {
-                    tabs.forEach((tab) => {
-                      Browser.tabs
-                        .sendMessage(tab.id, {
-                          type: 'CHANGE_LANG',
-                          data: {
-                            lang,
-                          },
-                        })
-                        .catch(() => {})
-                    })
-                  })
-                }}
-              >
-                {Object.entries(languageList).map(([k, v]) => {
-                  return (
-                    <option value={k} key={k} selected={k === config.preferredLanguage}>
-                      {v.native}
-                    </option>
-                  )
-                })}
-              </select>
-            </label>
-            <label>
-              <legend>{t('Triggers')}</legend>
-              <select
-                required
-                onChange={(e) => {
-                  const mode = e.target.value
-                  updateConfig({ triggerMode: mode })
-                }}
-              >
-                {Object.entries(TriggerMode).map(([key, desc]) => {
-                  return (
-                    <option value={key} key={key} selected={key === config.triggerMode}>
-                      {t(desc)}
-                    </option>
-                  )
-                })}
-              </select>
-            </label>
-            <label>
-              <legend>{t('API Mode')}</legend>
-              <span style="display: flex; gap: 15px;">
-                <select
-                  style={
-                    isUsingApiKey(config) ||
-                    isUsingMultiModeModel(config) ||
-                    isUsingCustomModel(config) ||
-                    isUsingAzureOpenAi(config) ||
-                    isUsingClaude2Api(config) ||
-                    isUsingCustomNameOnlyModel(config)
-                      ? 'width: 50%;'
-                      : undefined
-                  }
-                  required
-                  onChange={(e) => {
-                    const modelName = e.target.value
-                    updateConfig({ modelName: modelName })
-                    setCurrentModel(Models[modelName])
-                  }}
-                >
-                  {config.activeApiModes.map((modelName) => {
-                    let desc
-                    // 这里对'-'做了处理 为了处理ModelMode
-                    if (modelName.includes('-')) {
-                      const splits = modelName.split('-')
-                      if (splits[0] in Models)
-                        desc = `${t(Models[splits[0]].desc)} (${t(ModelMode[splits[1]])})`
-                    } else {
-                      if (modelName in Models) desc = t(Models[modelName].desc)
-                    }
-                    if (desc)
-                      return (
-                        <option
-                          value={modelName}
-                          key={modelName}
-                          selected={modelName === config.modelName}
-                        >
-                          {desc}
-                        </option>
-                      )
-                  })}
-                </select>
-                {isUsingMultiModeModel(config) && (
+            {/* TODO: delete  */}
+            {false && (
+              <label>
+                <legend>{t('API Mode')}</legend>
+                <span style="display: flex; gap: 15px;">
                   <select
-                    style="width: 50%;"
+                    style={
+                      isUsingApiKey(config) ||
+                      isUsingMultiModeModel(config) ||
+                      isUsingCustomModel(config) ||
+                      isUsingAzureOpenAi(config) ||
+                      isUsingClaude2Api(config) ||
+                      isUsingCustomNameOnlyModel(config)
+                        ? 'width: 50%;'
+                        : undefined
+                    }
                     required
                     onChange={(e) => {
-                      const modelMode = e.target.value
-                      updateConfig({ modelMode: modelMode })
+                      const modelName = e.target.value
+                      updateConfig({ modelName: modelName })
+                      setCurrentModel(Models[modelName])
                     }}
                   >
-                    {Object.entries(ModelMode).map(([key, desc]) => {
-                      return (
-                        <option value={key} key={key} selected={key === config.modelMode}>
-                          {t(desc)}
-                        </option>
-                      )
+                    {config.activeApiModes.map((modelName) => {
+                      let desc
+                      // 这里对'-'做了处理 为了处理ModelMode
+                      if (modelName.includes('-')) {
+                        const splits = modelName.split('-')
+                        if (splits[0] in Models)
+                          desc = `${t(Models[splits[0]].desc)} (${t(ModelMode[splits[1]])})`
+                      } else {
+                        if (modelName in Models) desc = t(Models[modelName].desc)
+                      }
+                      if (desc)
+                        return (
+                          <option
+                            value={modelName}
+                            key={modelName}
+                            selected={modelName === config.modelName}
+                          >
+                            {desc}
+                          </option>
+                        )
                     })}
                   </select>
-                )}
-                {isUsingApiKey(config) && (
-                  <span style="width: 50%; display: flex; gap: 5px;">
-                    <input
-                      type="password"
-                      value={config.apiKey}
-                      placeholder={t('API Key')}
+                  {/* 未处理配置key和balance的逻辑 */}
+                  {isUsingMultiModeModel(config) && (
+                    <select
+                      style="width: 50%;"
+                      required
                       onChange={(e) => {
-                        const apiKey = e.target.value
-                        updateConfig({ apiKey: apiKey })
+                        const modelMode = e.target.value
+                        updateConfig({ modelMode: modelMode })
+                      }}
+                    >
+                      {Object.entries(ModelMode).map(([key, desc]) => {
+                        return (
+                          <option value={key} key={key} selected={key === config.modelMode}>
+                            {t(desc)}
+                          </option>
+                        )
+                      })}
+                    </select>
+                  )}
+                  {isUsingApiKey(config) && (
+                    <span style="width: 50%; display: flex; gap: 5px;">
+                      <input
+                        type="password"
+                        value={config.apiKey}
+                        placeholder={t('API Key')}
+                        onChange={(e) => {
+                          const apiKey = e.target.value
+                          updateConfig({ apiKey: apiKey })
+                        }}
+                      />
+                      {config.apiKey.length === 0 ? (
+                        <a
+                          href={
+                            currentModel && 'keyGenerateUrl' in currentModel
+                              ? currentModel.keyGenerateUrl
+                              : 'https://platform.openai.com/account/api-keys'
+                          }
+                          target="_blank"
+                          rel="nofollow noopener noreferrer"
+                        >
+                          <button style="white-space: nowrap;" type="button">
+                            {t('Get')}
+                          </button>
+                        </a>
+                      ) : showBalance ? (
+                        balance ? (
+                          <button type="button" onClick={getBalance}>
+                            {balance}
+                          </button>
+                        ) : (
+                          <button type="button" onClick={getBalance}>
+                            {t('Balance')}
+                          </button>
+                        )
+                      ) : null}
+                    </span>
+                  )}
+                  {isUsingCustomModel(config) && (
+                    <input
+                      style="width: 50%;"
+                      type="text"
+                      value={config.customModelName}
+                      placeholder={t('Model Name')}
+                      onChange={(e) => {
+                        const customModelName = e.target.value
+                        updateConfig({ customModelName: customModelName })
                       }}
                     />
-                    {config.apiKey.length === 0 ? (
-                      <a
-                        href={
-                          currentModel && 'keyGenerateUrl' in currentModel
-                            ? currentModel.keyGenerateUrl
-                            : 'https://platform.openai.com/account/api-keys'
-                        }
-                        target="_blank"
-                        rel="nofollow noopener noreferrer"
-                      >
-                        <button style="white-space: nowrap;" type="button">
-                          {t('Get')}
-                        </button>
-                      </a>
-                    ) : showBalance ? (
-                      balance ? (
-                        <button type="button" onClick={getBalance}>
-                          {balance}
-                        </button>
-                      ) : (
-                        <button type="button" onClick={getBalance}>
-                          {t('Balance')}
-                        </button>
-                      )
-                    ) : null}
-                  </span>
-                )}
+                  )}
+                  {isUsingCustomNameOnlyModel(config) && (
+                    <input
+                      style="width: 50%;"
+                      type="text"
+                      value={config.poeCustomBotName}
+                      placeholder={t('Bot Name')}
+                      onChange={(e) => {
+                        const customName = e.target.value
+                        updateConfig({ poeCustomBotName: customName })
+                      }}
+                    />
+                  )}
+                  {isUsingAzureOpenAi(config) && (
+                    <input
+                      type="password"
+                      style="width: 50%;"
+                      value={config.azureApiKey}
+                      placeholder={t('Azure API Key')}
+                      onChange={(e) => {
+                        const apiKey = e.target.value
+                        updateConfig({ azureApiKey: apiKey })
+                      }}
+                    />
+                  )}
+                  {isUsingClaude2Api(config) && (
+                    <input
+                      type="password"
+                      style="width: 50%;"
+                      value={config.claudeApiKey}
+                      placeholder={t('Claude API Key')}
+                      onChange={(e) => {
+                        const apiKey = e.target.value
+                        updateConfig({ claudeApiKey: apiKey })
+                      }}
+                    />
+                  )}
+                  {isUsingChatGLMApi(config) && (
+                    <input
+                      type="password"
+                      style="width: 50%;"
+                      value={config.chatglmApiKey}
+                      placeholder={t('ChatGLM API Key')}
+                      onChange={(e) => {
+                        const apiKey = e.target.value
+                        updateConfig({ chatglmApiKey: apiKey })
+                      }}
+                    />
+                  )}
+                </span>
                 {isUsingCustomModel(config) && (
                   <input
-                    style="width: 50%;"
                     type="text"
-                    value={config.customModelName}
-                    placeholder={t('Model Name')}
+                    value={config.customModelApiUrl}
+                    placeholder={t('Custom Model API Url')}
                     onChange={(e) => {
-                      const customModelName = e.target.value
-                      updateConfig({ customModelName: customModelName })
+                      const value = e.target.value
+                      updateConfig({ customModelApiUrl: value })
                     }}
                   />
                 )}
-                {isUsingCustomNameOnlyModel(config) && (
+                {isUsingCustomModel(config) && (
                   <input
-                    style="width: 50%;"
-                    type="text"
-                    value={config.poeCustomBotName}
-                    placeholder={t('Bot Name')}
+                    type="password"
+                    value={config.customApiKey}
+                    placeholder={t('API Key')}
                     onChange={(e) => {
-                      const customName = e.target.value
-                      updateConfig({ poeCustomBotName: customName })
+                      const apiKey = e.target.value
+                      updateConfig({ customApiKey: apiKey })
                     }}
                   />
                 )}
                 {isUsingAzureOpenAi(config) && (
                   <input
                     type="password"
-                    style="width: 50%;"
-                    value={config.azureApiKey}
-                    placeholder={t('Azure API Key')}
+                    value={config.azureEndpoint}
+                    placeholder={t('Azure Endpoint')}
                     onChange={(e) => {
-                      const apiKey = e.target.value
-                      updateConfig({ azureApiKey: apiKey })
+                      const endpoint = e.target.value
+                      updateConfig({ azureEndpoint: endpoint })
                     }}
                   />
                 )}
-                {isUsingClaude2Api(config) && (
+                {isUsingAzureOpenAi(config) && (
                   <input
-                    type="password"
-                    style="width: 50%;"
-                    value={config.claudeApiKey}
-                    placeholder={t('Claude API Key')}
+                    type="text"
+                    value={config.azureDeploymentName}
+                    placeholder={t('Azure Deployment Name')}
                     onChange={(e) => {
-                      const apiKey = e.target.value
-                      updateConfig({ claudeApiKey: apiKey })
+                      const deploymentName = e.target.value
+                      updateConfig({ azureDeploymentName: deploymentName })
                     }}
                   />
                 )}
-                {isUsingChatGLMApi(config) && (
+                {isUsingGithubThirdPartyApi(config) && (
                   <input
-                    type="password"
-                    style="width: 50%;"
-                    value={config.chatglmApiKey}
-                    placeholder={t('ChatGLM API Key')}
+                    type="text"
+                    value={config.githubThirdPartyUrl}
+                    placeholder={t('API Url')}
                     onChange={(e) => {
-                      const apiKey = e.target.value
-                      updateConfig({ chatglmApiKey: apiKey })
+                      const url = e.target.value
+                      updateConfig({ githubThirdPartyUrl: url })
                     }}
                   />
                 )}
-              </span>
-              {isUsingCustomModel(config) && (
-                <input
-                  type="text"
-                  value={config.customModelApiUrl}
-                  placeholder={t('Custom Model API Url')}
-                  onChange={(e) => {
-                    const value = e.target.value
-                    updateConfig({ customModelApiUrl: value })
-                  }}
-                />
-              )}
-              {isUsingCustomModel(config) && (
-                <input
-                  type="password"
-                  value={config.customApiKey}
-                  placeholder={t('API Key')}
-                  onChange={(e) => {
-                    const apiKey = e.target.value
-                    updateConfig({ customApiKey: apiKey })
-                  }}
-                />
-              )}
-              {isUsingAzureOpenAi(config) && (
-                <input
-                  type="password"
-                  value={config.azureEndpoint}
-                  placeholder={t('Azure Endpoint')}
-                  onChange={(e) => {
-                    const endpoint = e.target.value
-                    updateConfig({ azureEndpoint: endpoint })
-                  }}
-                />
-              )}
-              {isUsingAzureOpenAi(config) && (
-                <input
-                  type="text"
-                  value={config.azureDeploymentName}
-                  placeholder={t('Azure Deployment Name')}
-                  onChange={(e) => {
-                    const deploymentName = e.target.value
-                    updateConfig({ azureDeploymentName: deploymentName })
-                  }}
-                />
-              )}
-              {isUsingGithubThirdPartyApi(config) && (
-                <input
-                  type="text"
-                  value={config.githubThirdPartyUrl}
-                  placeholder={t('API Url')}
-                  onChange={(e) => {
-                    const url = e.target.value
-                    updateConfig({ githubThirdPartyUrl: url })
-                  }}
-                />
-              )}
-            </label>
+              </label>
+            )}
           </Stack>
         </Card>
       </Grid>
-      <Grid item xs={12} md={8}>
+      <Grid item xs={12} md={5}>
         <Card>
-          <label>
-            <legend>{t('When Icon Clicked')}</legend>
-            <select
-              required
-              onChange={(e) => {
-                const mode = e.target.value
-                updateConfig({ clickIconAction: mode })
-              }}
-            >
-              <option value="popup" key="popup" selected={config.clickIconAction === 'popup'}>
-                {t('Open Settings')}
-              </option>
-              {Object.entries(menuConfig).map(([k, v]) => {
-                return (
-                  <option value={k} key={k} selected={k === config.clickIconAction}>
-                    {t(v.label)}
-                  </option>
-                )
-              })}
-            </select>
-          </label>
-          <label>
-            <input
-              type="checkbox"
-              checked={config.insertAtTop}
-              onChange={(e) => {
-                const checked = e.target.checked
-                updateConfig({ insertAtTop: checked })
-              }}
+          <Stack spacing={2} direction="column" sx={{ p: 3 }}>
+            <Typography variant="overline" sx={{ color: 'text.secondary' }}>
+              ChatWindow
+            </Typography>
+            <FormControlLabel
+              control={
+                <Switch
+                  checked={config.alwaysPinWindow}
+                  onChange={(e) => {
+                    const checked = e.target.checked
+                    updateConfig({ alwaysPinWindow: checked })
+                  }}
+                />
+              }
+              label={t('Always pin the floating window')}
             />
-            {t('Insert ChatGPT at the top of search results')}
-          </label>
-          <label>
-            <input
-              type="checkbox"
-              checked={config.lockWhenAnswer}
-              onChange={(e) => {
-                const checked = e.target.checked
-                updateConfig({ lockWhenAnswer: checked })
-              }}
+            {!isMobile() && !isFirefox() && !isSafari() && (
+              <FormControlLabel
+                control={
+                  <Switch
+                    checked={backgroundPermission}
+                    onChange={(e) => {
+                      const checked = e.target.checked
+                      if (checked)
+                        Browser.permissions
+                          .request({ permissions: ['background'] })
+                          .then((result) => {
+                            setBackgroundPermission(result)
+                          })
+                      else
+                        Browser.permissions
+                          .remove({ permissions: ['background'] })
+                          .then((result) => {
+                            setBackgroundPermission(result)
+                          })
+                    }}
+                  />
+                }
+                label={t('Keep Conversation Window in Background')}
+              />
+            )}
+            {!isMobile() && (
+              <FormControlLabel
+                control={
+                  <Switch
+                    checked={config.alwaysCreateNewConversationWindow}
+                    onChange={(e) => {
+                      const checked = e.target.checked
+                      updateConfig({ alwaysCreateNewConversationWindow: checked })
+                    }}
+                  />
+                }
+                label={t('Always Create New Conversation Window')}
+              />
+            )}
+            <FormControlLabel
+              control={
+                <Switch
+                  checked={config.focusAfterAnswer}
+                  onChange={(e) => {
+                    const checked = e.target.checked
+                    updateConfig({ focusAfterAnswer: checked })
+                  }}
+                />
+              }
+              label={t('Focus to input box after answering')}
             />
-            {t('Lock scrollbar while answering')}
-          </label>
-          <label>
-            <input
-              type="checkbox"
-              checked={config.autoRegenAfterSwitchModel}
-              onChange={(e) => {
-                const checked = e.target.checked
-                updateConfig({ autoRegenAfterSwitchModel: checked })
-              }}
+            <FormControlLabel
+              control={
+                <Switch
+                  checked={config.lockWhenAnswer}
+                  onChange={(e) => {
+                    const checked = e.target.checked
+                    updateConfig({ lockWhenAnswer: checked })
+                  }}
+                />
+              }
+              label={t('Lock scrollbar while answering')}
             />
-            {t('Regenerate the answer after switching model')}
-          </label>
-          <label>
-            <input
-              type="checkbox"
-              checked={config.selectionToolsNextToInputBox}
-              onChange={(e) => {
-                const checked = e.target.checked
-                updateConfig({ selectionToolsNextToInputBox: checked })
-              }}
+            <FormControlLabel
+              control={
+                <Switch
+                  checked={config.autoRegenAfterSwitchModel}
+                  onChange={(e) => {
+                    const checked = e.target.checked
+                    updateConfig({ autoRegenAfterSwitchModel: checked })
+                  }}
+                />
+              }
+              label={t('Regenerate the answer after switching model')}
             />
-            {t('Display selection tools next to input box to avoid blocking')}
-          </label>
-          <label>
-            <input
-              type="checkbox"
-              checked={config.alwaysPinWindow}
-              onChange={(e) => {
-                const checked = e.target.checked
-                updateConfig({ alwaysPinWindow: checked })
-              }}
+            <Typography variant="overline" sx={{ color: 'text.secondary' }}>
+              PageInjection
+            </Typography>
+            <FormControlLabel
+              control={
+                <Switch
+                  checked={config.insertAtTop}
+                  onChange={(e) => {
+                    const checked = e.target.checked
+                    updateConfig({ insertAtTop: checked })
+                  }}
+                />
+              }
+              label={t('Insert ChatGPT at the top of search results')}
             />
-            {t('Always pin the floating window')}
-          </label>
-          <label>
-            <input
-              type="checkbox"
-              checked={config.focusAfterAnswer}
-              onChange={(e) => {
-                const checked = e.target.checked
-                updateConfig({ focusAfterAnswer: checked })
-              }}
+            <FormControlLabel
+              control={
+                <Switch
+                  checked={config.selectionToolsNextToInputBox}
+                  onChange={(e) => {
+                    const checked = e.target.checked
+                    updateConfig({ selectionToolsNextToInputBox: checked })
+                  }}
+                />
+              }
+              label={t('Display selection tools next to input box to avoid blocking')}
             />
-            {t('Focus to input box after answering')}
-          </label>
+          </Stack>
+        </Card>
+      </Grid>
+      <Grid item xs={12} md={3}>
+        <Card>
+          <Stack spacing={2} direction="column" sx={{ p: 3 }}>
+            <Typography variant="overline" sx={{ color: 'text.secondary' }}>
+              SelectionTool
+            </Typography>
+            {config.selectionTools.map((key) => (
+              <label key={key}>
+                <FormControlLabel
+                  control={
+                    <Switch
+                      checked={config.activeSelectionTools.includes(key)}
+                      onChange={(e) => {
+                        const checked = e.target.checked
+                        const activeSelectionTools = config.activeSelectionTools.filter(
+                          (i) => i !== key,
+                        )
+                        if (checked) activeSelectionTools.push(key)
+                        updateConfig({ activeSelectionTools })
+                      }}
+                    />
+                  }
+                  label={t(toolsConfig[key].label)}
+                />
+              </label>
+            ))}
+          </Stack>
         </Card>
       </Grid>
     </Grid>

@@ -5,8 +5,6 @@ import '../_locales/i18n-react'
 import { getPreferredLanguageKey } from '../config/index.mjs'
 import Settings from './Settings'
 
-document.body.style.margin = 0
-document.body.style.overflow = 'hidden'
 getPreferredLanguageKey().then((lang) => {
   changeLanguage(lang)
 })

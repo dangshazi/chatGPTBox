@@ -1,6 +1,6 @@
 import { capitalCase } from 'change-case'
 // @mui
-import { Box, Card, Container, Tab, Tabs, Typography } from '@mui/material'
+import { Box, Card, Container, Page, Tab, Tabs, Typography } from '@mui/material'
 
 // hooks
 import useTabs from '../hooks/useTabs'
@@ -109,39 +109,41 @@ export default function UserAccount() {
       <ThemeColorPresets>
         <ThemeLocalization>
           <NotistackProvider>
-            <Container>
-              <Box sx={{ mb: 5 }} />
-              <Card>
-                <Typography display="flex" alignItems="center" variant="h4" sx={{ margin: 2 }}>
-                  <Iconify icon={'eva:settings-fill'} sx={{ fontSize: 30 }} />
-                  {t('Settings')}
-                </Typography>
-              </Card>
-              <Tabs
-                allowScrollButtonsMobile
-                variant="scrollable"
-                scrollButtons="auto"
-                value={currentTab}
-                onChange={onChangeTab}
-              >
-                {ACCOUNT_TABS.map((tab) => (
-                  <Tab
-                    disableRipple
-                    key={tab.value}
-                    label={capitalCase(tab.value)}
-                    icon={tab.icon}
-                    value={tab.value}
-                  />
-                ))}
-              </Tabs>
+            <Page title="User Settings">
+              <Container>
+                <Box sx={{ mb: 5 }} />
+                <Card>
+                  <Typography display="flex" alignItems="center" variant="h4" sx={{ margin: 2 }}>
+                    <Iconify icon={'eva:settings-fill'} sx={{ fontSize: 30 }} />
+                    {t('Settings')}
+                  </Typography>
+                </Card>
+                <Tabs
+                  allowScrollButtonsMobile
+                  variant="scrollable"
+                  scrollButtons="auto"
+                  value={currentTab}
+                  onChange={onChangeTab}
+                >
+                  {ACCOUNT_TABS.map((tab) => (
+                    <Tab
+                      disableRipple
+                      key={tab.value}
+                      label={capitalCase(tab.value)}
+                      icon={tab.icon}
+                      value={tab.value}
+                    />
+                  ))}
+                </Tabs>
 
-              <Box sx={{ mb: 1 }} />
+                <Box sx={{ mb: 1 }} />
 
-              {ACCOUNT_TABS.map((tab) => {
-                const isMatched = tab.value === currentTab
-                return isMatched && <Box key={tab.value}>{tab.component}</Box>
-              })}
-            </Container>
+                {ACCOUNT_TABS.map((tab) => {
+                  const isMatched = tab.value === currentTab
+                  return isMatched && <Box key={tab.value}>{tab.component}</Box>
+                })}
+              </Container>
+            </Page>
           </NotistackProvider>
         </ThemeLocalization>
       </ThemeColorPresets>
