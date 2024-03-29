@@ -85,14 +85,15 @@ export const moonshotApiModelKeys = ['moonshot_v1_8k', 'moonshot_v1_32k', 'moons
  * @type {Object.<string,Model>}
  */
 export const Models = {
-  chatgptFree35: { value: 'text-davinci-002-render-sha', desc: 'ChatGPT (Web)' },
+  // tinghua : need chatglmApiKey
+  chatglmTurbo: { value: 'chatglm_turbo', desc: 'ChatGLM (ChatGLM-Turbo)' },
 
-  chatgptPlus4: { value: 'gpt-4', desc: 'ChatGPT (Web, GPT-4 All in one)' },
-  chatgptPlus4Browsing: { value: 'gpt-4-gizmo', desc: 'ChatGPT (Web, GPT-4)' },
+  // Use OpenAI API : need apiKey
+  gptApiInstruct: { value: 'gpt-3.5-turbo-instruct', desc: 'GPT-3.5-turbo Instruct' },
+  gptApiDavinci: { value: 'text-davinci-003', desc: 'GPT-3.5' },
 
   chatgptApi35: { value: 'gpt-3.5-turbo', desc: 'ChatGPT (GPT-3.5-turbo)' },
   chatgptApi35_16k: { value: 'gpt-3.5-turbo-16k', desc: 'ChatGPT (GPT-3.5-turbo-16k)' },
-
   chatgptApi4_8k: { value: 'gpt-4', desc: 'ChatGPT (GPT-4-8k)' },
   chatgptApi4_32k: { value: 'gpt-4-32k', desc: 'ChatGPT (GPT-4-32k)' },
   chatgptApi4_128k: {
@@ -111,8 +112,15 @@ export const Models = {
     value: 'gpt-4-0125-preview',
     desc: 'ChatGPT (GPT-4-Turbo 128k 0125 Preview)',
   },
+  chatgptApi35_1106: { value: 'gpt-3.5-turbo-1106', desc: 'ChatGPT (GPT-3.5-turbo 1106)' },
+  chatgptApi35_0125: { value: 'gpt-3.5-turbo-0125', desc: 'ChatGPT (GPT-3.5-turbo 0125)' },
+  chatgptApi4_8k_0613: { value: 'gpt-4', desc: 'ChatGPT (GPT-4-8k 0613)' },
+  chatgptApi4_32k_0613: { value: 'gpt-4-32k', desc: 'ChatGPT (GPT-4-32k 0613)' },
 
-  claude2WebFree: { value: '', desc: 'Claude.ai (Web)' },
+  // use azure API : need azureApiKey
+  azureOpenAi: { value: '', desc: 'ChatGPT (Azure)' },
+
+  // use claude.ai Open API : need claudeApiKey
   claude12Api: { value: 'claude-instant-1.2', desc: 'Claude.ai (API, Claude Instant 1.2)' },
   claude2Api: { value: 'claude-2.0', desc: 'Claude.ai (API, Claude 2)' },
   claude21Api: { value: 'claude-2.1', desc: 'Claude.ai (API, Claude 2.1)' },
@@ -123,30 +131,47 @@ export const Models = {
   claude3SonnetApi: { value: 'claude-3-sonnet-20240229', desc: 'Claude.ai (API, Claude 3 Sonnet)' },
   claude3OpusApi: { value: 'claude-3-opus-20240229', desc: 'Claude.ai (API, Claude 3 Opus)' },
 
-  bingFree4: { value: '', desc: 'Bing (Web, GPT-4)' },
-  bingFreeSydney: { value: '', desc: 'Bing (Web, GPT-4, Sydney)' },
+  // Use Moonshot API : need moonshotApiKey
+  moonshot_v1_8k: {
+    value: 'moonshot-v1-8k',
+    desc: 'Moonshot (8k)',
+  },
+  moonshot_v1_32k: {
+    value: 'moonshot-v1-32k',
+    desc: 'Moonshot (32k)',
+  },
+  moonshot_v1_128k: {
+    value: 'moonshot-v1-128k',
+    desc: 'Moonshot (128k)',
+  },
 
-  moonshotWebFree: { value: '', desc: 'Kimi.Moonshot (Web, 100k)' },
-
-  bardWebFree: { value: '', desc: 'Gemini (Web)' },
-
-  chatglmTurbo: { value: 'chatglm_turbo', desc: 'ChatGLM (ChatGLM-Turbo)' },
-
+  // ---------------------------------------------------------------------------//
+  // use OpenAI Web  :
+  chatgptWebFree: { value: '', desc: 'ChatGPT (Web)' },
+  chatgptFree35: { value: 'text-davinci-002-render-sha', desc: 'ChatGPT (Web)' },
+  chatgptPlus4Browsing: { value: 'gpt-4-gizmo', desc: 'ChatGPT (Web, GPT-4)' },
+  chatgptPlus4: { value: 'gpt-4', desc: 'ChatGPT (Web, GPT-4 All in one)' },
+  // use OpenAI Mobile  :
   chatgptFree35Mobile: { value: 'text-davinci-002-render-sha-mobile', desc: 'ChatGPT (Mobile)' },
   chatgptPlus4Mobile: { value: 'gpt-4-mobile', desc: 'ChatGPT (Mobile, GPT-4)' },
 
-  chatgptApi35_1106: { value: 'gpt-3.5-turbo-1106', desc: 'ChatGPT (GPT-3.5-turbo 1106)' },
-  chatgptApi35_0125: { value: 'gpt-3.5-turbo-0125', desc: 'ChatGPT (GPT-3.5-turbo 0125)' },
-  chatgptApi4_8k_0613: { value: 'gpt-4', desc: 'ChatGPT (GPT-4-8k 0613)' },
-  chatgptApi4_32k_0613: { value: 'gpt-4-32k', desc: 'ChatGPT (GPT-4-32k 0613)' },
+  // use Claude.ai Web  :
+  claude2WebFree: { value: '', desc: 'Claude.ai (Web)' },
 
-  gptApiInstruct: { value: 'gpt-3.5-turbo-instruct', desc: 'GPT-3.5-turbo Instruct' },
-  gptApiDavinci: { value: 'text-davinci-003', desc: 'GPT-3.5' },
+  // use Bing Web  :
+  bingFree4: { value: '', desc: 'Bing (Web, GPT-4)' },
+  bingFreeSydney: { value: '', desc: 'Bing (Web, GPT-4, Sydney)' },
+
+  // use Moonshot Web  :
+  moonshotWebFree: { value: '', desc: 'Kimi.Moonshot (Web, 100k)' },
+
+  // use Gemini Web  :
+  bardWebFree: { value: '', desc: 'Gemini (Web)' },
 
   customModel: { value: '', desc: 'Custom Model' },
-  azureOpenAi: { value: '', desc: 'ChatGPT (Azure)' },
   waylaidwandererApi: { value: '', desc: 'Waylaidwanderer API (Github)' },
 
+  // use Poe AI Web  :
   poeAiWebSage: { value: 'Assistant', desc: 'Poe AI (Web, Assistant)' },
   poeAiWebGPT4: { value: 'gpt-4', desc: 'Poe AI (Web, GPT-4)' },
   poeAiWebGPT4_32k: { value: 'gpt-4-32k', desc: 'Poe AI (Web, GPT-4-32k)' },
@@ -160,19 +185,6 @@ export const Models = {
   poeAiWebChatGpt: { value: 'chatgpt', desc: 'Poe AI (Web, ChatGPT)' },
   poeAiWebChatGpt_16k: { value: 'chatgpt-16k', desc: 'Poe AI (Web, ChatGPT-16k)' },
   poeAiWebCustom: { value: '', desc: 'Poe AI (Web, Custom)' },
-
-  moonshot_v1_8k: {
-    value: 'moonshot-v1-8k',
-    desc: 'Moonshot (8k)',
-  },
-  moonshot_v1_32k: {
-    value: 'moonshot-v1-32k',
-    desc: 'Moonshot (32k)',
-  },
-  moonshot_v1_128k: {
-    value: 'moonshot-v1-128k',
-    desc: 'Moonshot (128k)',
-  },
 }
 
 for (const modelName in Models) {

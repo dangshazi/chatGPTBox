@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next'
 
 import { Card, FormControlLabel, Grid, Stack, Switch, Typography } from '@mui/material'
 
-import { config as toolsConfig } from '../../content-script/selection-tools/index.mjs'
+import { ModelMode, Models } from '../../config/index.mjs'
 
 GptModelConfig.propTypes = {
   config: PropTypes.object.isRequired,
@@ -22,26 +22,36 @@ export function GptModelConfig({ config, updateConfig }) {
             <Typography variant="overline" sx={{ color: 'text.secondary' }}>
               API Parameters
             </Typography>
-
-            {config.selectionTools.map((key) => (
-              <FormControlLabel
-                key={key}
-                control={
-                  <Switch
-                    checked={config.activeSelectionTools.includes(key)}
-                    onChange={(e) => {
-                      const checked = e.target.checked
-                      const activeSelectionTools = config.activeSelectionTools.filter(
-                        (i) => i !== key,
-                      )
-                      if (checked) activeSelectionTools.push(key)
-                      updateConfig({ activeSelectionTools })
-                    }}
+            {config.apiModes.map((modelName) => {
+              let desc
+              if (modelName.includes('-')) {
+                const splits = modelName.split('-')
+                if (splits[0] in Models)
+                  desc = `${t(Models[splits[0]].desc)} (${t(ModelMode[splits[1]])})`
+              } else {
+                if (modelName in Models) desc = t(Models[modelName].desc)
+              }
+              if (desc)
+                return (
+                  <FormControlLabel
+                    key={modelName}
+                    control={
+                      <Switch
+                        checked={config.activeApiModes.includes(modelName)}
+                        onChange={(e) => {
+                          const checked = e.target.checked
+                          const activeApiModes = config.activeApiModes.filter(
+                            (i) => i !== modelName,
+                          )
+                          if (checked) activeApiModes.push(modelName)
+                          updateConfig({ activeApiModes })
+                        }}
+                      />
+                    }
+                    label={desc}
                   />
-                }
-                label={t(toolsConfig[key].label)}
-              />
-            ))}
+                )
+            })}
           </Stack>
         </Card>
       </Grid>
