@@ -60,6 +60,7 @@ function ConversationCard(props) {
    */
   const [conversationItemDataArray, setConversationItemDataArray] = useState(
     (() => {
+      // 从session初始化conversationItemData
       if (session.conversationRecords.length === 0)
         if (props.question)
           return [
@@ -72,6 +73,7 @@ function ConversationCard(props) {
       else {
         const ret = []
         for (const record of session.conversationRecords) {
+          // 这里是一条隔着一条，并没有标注来源
           ret.push(new ConversationItemData('question', record.question, true))
           ret.push(new ConversationItemData('answer', record.answer, true))
         }
@@ -211,6 +213,7 @@ function ConversationCard(props) {
   const postMessage = async ({ session, stop }) => {
     if (useForegroundFetch) {
       foregroundMessageListeners.current.forEach((listener) => listener({ session, stop }))
+      // 当前会话不为空，发送到bing?
       if (session) {
         const fakePort = {
           postMessage: (msg) => {
@@ -329,6 +332,7 @@ function ConversationCard(props) {
             ...(isSafari() ? { maxWidth: '200px' } : {}),
           }}
         >
+          {/* floatingTool close icon */}
           {props.closeable ? (
             <XLg
               className="gpt-util-icon"
@@ -340,6 +344,7 @@ function ConversationCard(props) {
               }}
             />
           ) : props.dockable ? (
+            //  没找到pin的用途
             <Pin
               className="gpt-util-icon"
               title={t('Pin the Window')}
@@ -349,6 +354,7 @@ function ConversationCard(props) {
               }}
             />
           ) : (
+            // independent panel中的图标
             <img src={logo} style="user-select:none;width:20px;height:20px;" />
           )}
           <select
@@ -357,12 +363,15 @@ function ConversationCard(props) {
             required
             onChange={(e) => {
               const modelName = e.target.value
+              // 创建新的session
               const newSession = { ...session, modelName, aiName: Models[modelName].desc }
+              // 切换模型重新回答
               if (config.autoRegenAfterSwitchModel && conversationItemDataArray.length > 0)
                 getRetryFn(newSession)()
               else setSession(newSession)
             }}
           >
+            {/* 选择使用的模型 */}
             {config.activeApiModes.map((modelName) => {
               let desc
               if (modelName.includes('-')) {
@@ -385,9 +394,11 @@ function ConversationCard(props) {
             })}
           </select>
         </span>
+        {/* floatingTool使用的拖拽区域 */}
         {props.draggable && !completeDraggable && (
           <div className="draggable" style={{ flexGrow: 2, cursor: 'move', height: '55px' }} />
         )}
+        {/* 模型旁边的几个工具 */}
         <span
           className="gpt-util-group"
           style={{
@@ -474,6 +485,7 @@ function ConversationCard(props) {
               <ArchiveIcon size={16} />
             </span>
           )}
+          {/* 这是单独页面才有的 */}
           {conversationItemDataArray.length > 0 && (
             <span
               title={t('Jump to bottom')}
@@ -507,6 +519,7 @@ function ConversationCard(props) {
         </span>
       </div>
       <hr />
+      {/* 下面是聊天内容 */}
       <div
         ref={bodyRef}
         className="markdown-body"
