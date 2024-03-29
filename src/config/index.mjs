@@ -168,9 +168,6 @@ export const Models = {
   // use Gemini Web  :
   bardWebFree: { value: '', desc: 'Gemini (Web)' },
 
-  customModel: { value: '', desc: 'Custom Model' },
-  waylaidwandererApi: { value: '', desc: 'Waylaidwanderer API (Github)' },
-
   // use Poe AI Web  :
   poeAiWebSage: { value: 'Assistant', desc: 'Poe AI (Web, Assistant)' },
   poeAiWebGPT4: { value: 'gpt-4', desc: 'Poe AI (Web, GPT-4)' },
@@ -185,7 +182,123 @@ export const Models = {
   poeAiWebChatGpt: { value: 'chatgpt', desc: 'Poe AI (Web, ChatGPT)' },
   poeAiWebChatGpt_16k: { value: 'chatgpt-16k', desc: 'Poe AI (Web, ChatGPT-16k)' },
   poeAiWebCustom: { value: '', desc: 'Poe AI (Web, Custom)' },
+
+  customModel: { value: '', desc: 'Custom Model' },
+  waylaidwandererApi: { value: '', desc: 'Waylaidwanderer API (Github)' },
 }
+export const ModeleNames = Object.keys(Models)
+
+// API keys
+export const gptApiModelKeys = ['gptApiInstruct', 'gptApiDavinci']
+export const chatgptApiModelKeys = [
+  'chatgptApi35',
+  'chatgptApi35_16k',
+  'chatgptApi35_1106',
+  'chatgptApi35_0125',
+  'chatgptApi4_8k',
+  'chatgptApi4_8k_0613',
+  'chatgptApi4_32k',
+  'chatgptApi4_32k_0613',
+  'chatgptApi4_128k_preview',
+  'chatgptApi4_128k_1106_preview',
+  'chatgptApi4_128k_0125_preview',
+]
+export const moonshotApiModelKeys = ['moonshot_v1_8k', 'moonshot_v1_32k', 'moonshot_v1_128k']
+export const customApiModelKeys = ['customModel']
+export const azureOpenAiApiModelKeys = ['azureOpenAi']
+export const claudeApiModelKeys = [
+  'claude12Api',
+  'claude2Api',
+  'claude21Api',
+  'claude3HaikuApi',
+  'claude3SonnetApi',
+  'claude3OpusApi',
+]
+export const chatglmApiModelKeys = ['chatglmTurbo']
+export const githubThirdPartyApiModelKeys = ['waylaidwandererApi']
+
+// Web keys
+export const chatgptWebModelKeys = [
+  'chatgptFree35',
+  'chatgptPlus4',
+  'chatgptFree35Mobile',
+  'chatgptPlus4Browsing',
+  'chatgptPlus4Mobile',
+]
+export const bingWebModelKeys = ['bingFree4', 'bingFreeSydney']
+export const bardWebModelKeys = ['bardWebFree']
+export const claudeWebModelKeys = ['claude2WebFree']
+export const moonshotWebModelKeys = ['moonshotWebFree']
+export const poeWebModelKeys = [
+  'poeAiWebSage', //poe.com/Assistant
+  'poeAiWebGPT4',
+  'poeAiWebGPT4_32k',
+  'poeAiWebClaudePlus',
+  'poeAiWebClaude',
+  'poeAiWebClaude100k',
+  'poeAiWebCustom',
+  'poeAiWebChatGpt',
+  'poeAiWebChatGpt_16k',
+  'poeAiWebGooglePaLM',
+  'poeAiWeb_Llama_2_7b',
+  'poeAiWeb_Llama_2_13b',
+  'poeAiWeb_Llama_2_70b',
+]
+
+export const ChatgptWebModels = ModeleNames.filter((key) =>
+  chatgptWebModelKeys.includes(key),
+).reduce((obj, key) => {
+  obj[key] = Models[key]
+  return obj
+}, {})
+
+export const BingWebModels = ModeleNames.filter((key) => bingWebModelKeys.includes(key)).reduce(
+  (obj, key) => {
+    obj[key] = Models[key]
+    return obj
+  },
+  {},
+)
+
+export const BardWebModels = ModeleNames.filter((key) => bardWebModelKeys.includes(key)).reduce(
+  (obj, key) => {
+    obj[key] = Models[key]
+    return obj
+  },
+  {},
+)
+
+export const ClaudeWebModels = ModeleNames.filter((key) => claudeWebModelKeys.includes(key)).reduce(
+  (obj, key) => {
+    obj[key] = Models[key]
+    return obj
+  },
+  {},
+)
+
+export const MoonshotWebModels = ModeleNames.filter((key) =>
+  moonshotWebModelKeys.includes(key),
+).reduce((obj, key) => {
+  obj[key] = Models[key]
+  return obj
+}, {})
+
+export const POEWebModels = ModeleNames.filter((key) => poeWebModelKeys.includes(key)).reduce(
+  (obj, key) => {
+    obj[key] = Models[key]
+    return obj
+  },
+  {},
+)
+
+/**
+ * @typedef {object} Model
+ * @property {string} value
+ * @property {string} desc
+ */
+/**
+ * @type {Object.<string,Model>}
+ */
 
 for (const modelName in Models) {
   if (isUsingMultiModeModel({ modelName }))
@@ -353,6 +466,13 @@ export function isUsingOpenAiApiKey(configOrSession) {
   )
 }
 
+export const OpenAIAPIModels = ModeleNames.filter(
+  (key) => gptApiModelKeys.includes(key) || chatgptApiModelKeys.includes(key),
+).reduce((obj, key) => {
+  obj[key] = Models[key]
+  return obj
+}, {})
+
 export function isUsingMultiModeModel(configOrSession) {
   return bingWebModelKeys.includes(configOrSession.modelName)
 }
@@ -365,9 +485,23 @@ export function isUsingChatGLMApi(configOrSession) {
   return chatglmApiModelKeys.includes(configOrSession.modelName)
 }
 
+export const ChatGLMAPIModels = ModeleNames.filter((key) =>
+  chatglmApiModelKeys.includes(key),
+).reduce((obj, key) => {
+  obj[key] = Models[key]
+  return obj
+}, {})
+
 export function isUsingMoonshotApi(configOrSession) {
   return moonshotApiModelKeys.includes(configOrSession.modelName)
 }
+
+export const MoonshotAPIModels = ModeleNames.filter((key) =>
+  moonshotApiModelKeys.includes(key),
+).reduce((obj, key) => {
+  obj[key] = Models[key]
+  return obj
+}, {})
 
 export function isUsingCustomNameOnlyModel(configOrSession) {
   return configOrSession.modelName === 'poeAiWebCustom'
@@ -377,9 +511,24 @@ export function isUsingAzureOpenAi(configOrSession) {
   return azureOpenAiApiModelKeys.includes(configOrSession.modelName)
 }
 
+export const AzureOpenAIModels = ModeleNames.filter((key) =>
+  azureOpenAiApiModelKeys.includes(key),
+).reduce((obj, key) => {
+  obj[key] = Models[key]
+  return obj
+}, {})
+
 export function isUsingClaudeApi(configOrSession) {
   return claudeApiModelKeys.includes(configOrSession.modelName)
 }
+
+export const ClaudeAPIModels = ModeleNames.filter((key) => claudeApiModelKeys.includes(key)).reduce(
+  (obj, key) => {
+    obj[key] = Models[key]
+    return obj
+  },
+  {},
+)
 
 export function isUsingMoonshotWeb(configOrSession) {
   return moonshotWebModelKeys.includes(configOrSession.modelName)
