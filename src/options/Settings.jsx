@@ -68,19 +68,19 @@ export default function UserAccount() {
   const ACCOUNT_TABS = [
     {
       value: 'general',
-      icon: <Iconify icon={'ic:round-account-box'} width={20} height={20} />,
+      icon: <Iconify icon={'ic:round-settings-input-component'} width={20} height={20} />,
       component: <GeneralConfig config={config} updateConfig={updateConfig} />,
     },
 
     {
       value: 'advanced',
-      icon: <Iconify icon={'ic:round-account-box'} width={20} height={20} />,
+      icon: <Iconify icon={'ic:round-admin-panel-settings'} width={20} height={20} />,
       component: <AdvancedConfig config={config} updateConfig={updateConfig} />,
     },
 
     {
       value: 'gpt_model',
-      icon: <Iconify icon={'ic:round-account-box'} width={20} height={20} />,
+      icon: <Iconify icon={'ic:round-calculate'} width={20} height={20} />,
       component: <GptModelConfig config={config} updateConfig={updateConfig} />,
     },
 
