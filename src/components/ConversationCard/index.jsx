@@ -1,30 +1,30 @@
-import { memo, useEffect, useMemo, useRef, useState } from 'react'
-import PropTypes from 'prop-types'
-import Browser from 'webextension-polyfill'
-import InputBox from '../InputBox'
-import ConversationItem from '../ConversationItem'
-import { createElementAtPosition, isFirefox, isMobile, isSafari } from '../../utils'
 import {
   ArchiveIcon,
   DesktopDownloadIcon,
   LinkExternalIcon,
   MoveToBottomIcon,
 } from '@primer/octicons-react'
-import { Pin, WindowDesktop, XLg } from 'react-bootstrap-icons'
 import FileSaver from 'file-saver'
-import { render } from 'preact'
-import FloatingToolbar from '../FloatingToolbar'
-import { useClampWindowSize } from '../../hooks/use-clamp-window-size'
-import { bingWebModelKeys, getUserConfig, ModelMode, Models } from '../../config/index.mjs'
-import { useTranslation } from 'react-i18next'
-import DeleteButton from '../DeleteButton'
-import { useConfig } from '../../hooks/use-config.mjs'
-import { createSession } from '../../services/local-session.mjs'
-import { v4 as uuidv4 } from 'uuid'
-import { initSession } from '../../services/init-session.mjs'
 import { findLastIndex } from 'lodash-es'
+import { render } from 'preact'
+import PropTypes from 'prop-types'
+import { memo, useEffect, useMemo, useRef, useState } from 'react'
+import { Pin, WindowDesktop, XLg } from 'react-bootstrap-icons'
+import { useTranslation } from 'react-i18next'
+import { v4 as uuidv4 } from 'uuid'
+import Browser from 'webextension-polyfill'
+import { ModelMode, Models, bingWebModelKeys, getUserConfig } from '../../config/index.mjs'
+import { useClampWindowSize } from '../../hooks/use-clamp-window-size'
+import { useConfig } from '../../hooks/use-config.mjs'
 import { generateAnswersWithBingWebApi } from '../../services/apis/bing-web.mjs'
+import { initSession } from '../../services/init-session.mjs'
+import { createSession } from '../../services/local-session.mjs'
 import { handlePortError } from '../../services/wrappers.mjs'
+import { createElementAtPosition, isFirefox, isMobile, isSafari } from '../../utils'
+import ConversationItem from '../ConversationItem'
+import DeleteButton from '../DeleteButton'
+import FloatingToolbar from '../FloatingToolbar'
+import InputBox from '../InputBox'
 
 const logo = Browser.runtime.getURL('logo.png')
 
@@ -44,6 +44,7 @@ class ConversationItemData extends Object {
 
 function ConversationCard(props) {
   const { t } = useTranslation()
+  // 用于标识当前的answer是否完整
   const [isReady, setIsReady] = useState(!props.question)
   // content-script connect to background
   const [port, setPort] = useState(() => Browser.runtime.connect())
@@ -57,7 +58,7 @@ function ConversationCard(props) {
   /**
    * @type {[ConversationItemData[], (conversationItemData: ConversationItemData[]) => void]}
    */
-  const [conversationItemData, setConversationItemData] = useState(
+  const [conversationItemDataArray, setConversationItemDataArray] = useState(
     (() => {
       if (session.conversationRecords.length === 0)
         if (props.question)
@@ -84,9 +85,10 @@ function ConversationCard(props) {
     setCompleteDraggable(!isSafari() && !isFirefox() && !isMobile())
   }, [])
 
+  // props.onUpdate用来updatePosition
   useEffect(() => {
-    if (props.onUpdate) props.onUpdate(port, session, conversationItemData)
-  }, [session, conversationItemData])
+    if (props.onUpdate) props.onUpdate(port, session, conversationItemDataArray)
+  }, [session, conversationItemDataArray])
 
   useEffect(() => {
     const { offsetHeight, scrollHeight, scrollTop } = bodyRef.current
@@ -99,7 +101,7 @@ function ConversationCard(props) {
         behavior: 'instant',
       })
     }
-  }, [conversationItemData])
+  }, [conversationItemDataArray])
 
   useEffect(async () => {
     // when the page is responsive, session may accumulate redundant data and needs to be cleared after remounting and before making a new request
@@ -117,12 +119,13 @@ function ConversationCard(props) {
    * @param {boolean} done
    */
   const updateAnswer = (value, appended, newType, done = false) => {
-    setConversationItemData((old) => {
+    setConversationItemDataArray((old) => {
       const copy = [...old]
       const index = findLastIndex(copy, (v) => v.type === 'answer' || v.type === 'error')
       if (index === -1) return copy
       copy[index] = new ConversationItemData(
         newType,
+        // 这里append是由接口返回的格式决定的：socket返回时为true，接口返回时为false
         appended ? copy[index].content + value : value,
       )
       copy[index].done = done
@@ -130,7 +133,9 @@ function ConversationCard(props) {
     })
   }
 
+  // background message process logic
   const portMessageListener = (msg) => {
+    // append fragment of answer when use socket
     if (msg.answer) {
       updateAnswer(msg.answer, false, 'answer')
     }
@@ -138,6 +143,7 @@ function ConversationCard(props) {
       if (msg.done) msg.session = { ...msg.session, isRetry: false }
       setSession(msg.session)
     }
+    // append empty string
     if (msg.done) {
       updateAnswer('', true, 'answer', true)
       setIsReady(true)
@@ -180,13 +186,13 @@ function ConversationCard(props) {
             }
 
           let lastItem
-          if (conversationItemData.length > 0)
-            lastItem = conversationItemData[conversationItemData.length - 1]
+          if (conversationItemDataArray.length > 0)
+            lastItem = conversationItemDataArray[conversationItemDataArray.length - 1]
           if (lastItem && (lastItem.content.includes('gpt-loading') || lastItem.type === 'error'))
             updateAnswer(t(formattedError), false, 'error')
           else
-            setConversationItemData([
-              ...conversationItemData,
+            setConversationItemDataArray([
+              ...conversationItemDataArray,
               new ConversationItemData('error', t(formattedError)),
             ])
           break
@@ -259,6 +265,7 @@ function ConversationCard(props) {
       }
     }
 
+    // 关闭chat的命令是由backgroud发过来的
     if (props.closeable) Browser.runtime.onMessage.addListener(closeChatsListener)
     port.onDisconnect.addListener(portListener)
     return () => {
@@ -266,6 +273,8 @@ function ConversationCard(props) {
       port.onDisconnect.removeListener(portListener)
     }
   }, [port])
+
+  // 只有用户在每次提交新的问题的时候才会变动conversationItemDataArray
   useEffect(() => {
     if (useForegroundFetch) {
       return () => {}
@@ -275,7 +284,7 @@ function ConversationCard(props) {
         port.onMessage.removeListener(portMessageListener)
       }
     }
-  }, [conversationItemData])
+  }, [conversationItemDataArray])
 
   const getRetryFn = (session) => async () => {
     updateAnswer(`<p class="gpt-loading">${t('Waiting for response...')}</p>`, false, 'answer')
@@ -284,9 +293,10 @@ function ConversationCard(props) {
     if (session.conversationRecords.length > 0) {
       const lastRecord = session.conversationRecords[session.conversationRecords.length - 1]
       if (
-        conversationItemData[conversationItemData.length - 1].done &&
-        conversationItemData.length > 1 &&
-        lastRecord.question === conversationItemData[conversationItemData.length - 2].content
+        conversationItemDataArray[conversationItemDataArray.length - 1].done &&
+        conversationItemDataArray.length > 1 &&
+        lastRecord.question ===
+          conversationItemDataArray[conversationItemDataArray.length - 2].content
       ) {
         session.conversationRecords.pop()
       }
@@ -348,7 +358,7 @@ function ConversationCard(props) {
             onChange={(e) => {
               const modelName = e.target.value
               const newSession = { ...session, modelName, aiName: Models[modelName].desc }
-              if (config.autoRegenAfterSwitchModel && conversationItemData.length > 0)
+              if (config.autoRegenAfterSwitchModel && conversationItemDataArray.length > 0)
                 getRetryFn(newSession)()
               else setSession(newSession)
             }}
@@ -429,7 +439,7 @@ function ConversationCard(props) {
                   conversationId: session.conversationId,
                 },
               })
-              setConversationItemData([])
+              setConversationItemDataArray([])
               const newSession = initSession({
                 ...session,
                 question: null,
@@ -464,7 +474,7 @@ function ConversationCard(props) {
               <ArchiveIcon size={16} />
             </span>
           )}
-          {conversationItemData.length > 0 && (
+          {conversationItemDataArray.length > 0 && (
             <span
               title={t('Jump to bottom')}
               className="gpt-util-icon"
@@ -506,14 +516,14 @@ function ConversationCard(props) {
             : { maxHeight: windowSize[1] * 0.55 + 'px', resize: 'vertical' }
         }
       >
-        {conversationItemData.map((data, idx) => (
+        {conversationItemDataArray.map((data, idx) => (
           <ConversationItem
             content={data.content}
             key={idx}
             type={data.type}
             descName={data.type === 'answer' && session.aiName}
             modelName={data.type === 'answer' && session.modelName}
-            onRetry={idx === conversationItemData.length - 1 ? retryFn : null}
+            onRetry={idx === conversationItemDataArray.length - 1 ? retryFn : null}
           />
         ))}
       </div>
@@ -527,7 +537,7 @@ function ConversationCard(props) {
             'answer',
             `<p class="gpt-loading">${t('Waiting for response...')}</p>`,
           )
-          setConversationItemData([...conversationItemData, newQuestion, newAnswer])
+          setConversationItemDataArray([...conversationItemDataArray, newQuestion, newAnswer])
           setIsReady(false)
 
           const newSession = { ...session, question, isRetry: false }
