@@ -35,6 +35,8 @@ import InputLabel from '@mui/material/InputLabel'
 
 import { config as toolsConfig } from '../../content-script/selection-tools/index.mjs'
 import { isFirefox, isMobile, isSafari, openUrl } from '../../utils/index.mjs'
+// hooks
+import useSettings from '../../hooks/useSettings'
 
 GeneralConfig.propTypes = {
   config: PropTypes.object.isRequired,
@@ -99,6 +101,7 @@ export function GeneralConfig({ config, updateConfig }) {
   const { t, i18n } = useTranslation()
   const [balance, setBalance] = useState(null)
   const [backgroundPermission, setBackgroundPermission] = useState(false)
+  const { themeMode, onChangeMode } = useSettings()
 
   if (!isMobile() && !isFirefox() && !isSafari()) {
     Browser.permissions.contains({ permissions: ['background'] }).then((result) => {
@@ -139,8 +142,9 @@ export function GeneralConfig({ config, updateConfig }) {
                 onChange={(e) => {
                   const mode = e.target.value
                   updateConfig({ themeMode: mode })
+                  onChangeMode(e)
                 }}
-                value={config.themeMode}
+                value={themeMode}
               >
                 {Object.entries(ThemeMode).map(([key, desc]) => {
                   return (
@@ -218,6 +222,7 @@ export function GeneralConfig({ config, updateConfig }) {
               <InputLabel id="clickIconAction">{t('When Icon Clicked')}</InputLabel>
               <Select
                 fullWidth
+                disabled
                 labelId="clickIconAction"
                 name="clickIconAction"
                 label="ClickIconAction"

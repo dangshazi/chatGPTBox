@@ -11,7 +11,7 @@ export const TriggerMode = {
 export const ThemeMode = {
   light: 'Light',
   dark: 'Dark',
-  auto: 'Auto',
+  // auto: 'Auto',
 }
 
 export const ModelMode = {
@@ -318,7 +318,7 @@ export const defaultConfig = {
   /** @type {keyof TriggerMode}*/
   triggerMode: 'manually',
   /** @type {keyof ThemeMode}*/
-  themeMode: 'auto',
+  themeMode: 'light',
   /** @type {keyof Models}*/
   modelName: 'chatgptFree35',
 
