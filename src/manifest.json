@@ -39,7 +39,7 @@
     "default_popup": "popup.html"
   },
   "side_panel": {
-    "default_path": "IndependentPanel.html"
+    "default_path": "chatpage.html"
   },
   "declarative_net_request": {
     "rule_resources": [

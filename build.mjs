@@ -65,6 +65,10 @@ async function runWebpack(isWithoutKatex, isWithoutTiktoken, minimal, callback) 
         import: './src/pages/IndependentPanel/index.jsx',
         dependOn: 'shared',
       },
+      chatpage: {
+        import: './src/chatpage/index.jsx',
+        dependOn: 'shared',
+      },
       shared: shared,
     },
     output: {
@@ -327,6 +331,10 @@ async function finishOutput(outputDirSuffix) {
     { src: 'src/options/index.html', dst: 'options.html' },
     { src: 'build/IndependentPanel.js', dst: 'IndependentPanel.js' },
     { src: 'src/pages/IndependentPanel/index.html', dst: 'IndependentPanel.html' },
+
+    { src: 'build/chatpage.js', dst: 'chatpage.js' },
+    { src: 'build/chatpage.css', dst: 'chatpage.css' },
+    { src: 'src/chatpage/index.html', dst: 'chatpage.html' },
   ]
 
   // chromium
