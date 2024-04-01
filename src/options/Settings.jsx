@@ -6,22 +6,14 @@ import { Box, Card, Container, Tab, Tabs, Typography } from '@mui/material'
 import useTabs from '../hooks/useTabs'
 
 import Iconify from '../components/Iconify'
-import NotistackProvider from '../components/NotistackProvider'
-import ThemeColorPresets from '../components/ThemeColorPresets'
-import ThemeLocalization from '../components/ThemeLocalization'
-
-// theme
-import ThemeProvider from '../theme'
 
 import AccountProfile from './account/AccountProfile'
 
 import { useEffect, useState } from 'react'
-import { HelmetProvider } from 'react-helmet-async'
 import { useTranslation } from 'react-i18next'
 import { defaultConfig, getPreferredLanguageKey, setUserConfig } from '../config/index.mjs'
 
 import Page from '../components/Page'
-import { SettingsProvider } from '../contexts/SettingsContext'
 import { AdvancedConfig } from './sections/AdvancedConfig'
 import { GeneralConfig } from './sections/GeneralConfig'
 import { GptModelConfig } from './sections/GptModelConfig'
@@ -112,57 +104,40 @@ export default function UserAccount() {
   ]
 
   return (
-    <HelmetProvider>
-      <SettingsProvider>
-        <ThemeProvider>
-          <ThemeColorPresets>
-            <ThemeLocalization>
-              <NotistackProvider>
-                <Page title="User Settings">
-                  <Container>
-                    <Box sx={{ mb: 5 }} />
-                    <Card>
-                      <Typography
-                        display="flex"
-                        alignItems="center"
-                        variant="h4"
-                        sx={{ margin: 2 }}
-                      >
-                        <Iconify icon={'eva:settings-fill'} sx={{ fontSize: 30 }} />
-                        {t('Settings')}
-                      </Typography>
-                    </Card>
-                    <Tabs
-                      allowScrollButtonsMobile
-                      variant="scrollable"
-                      scrollButtons="auto"
-                      value={currentTab}
-                      onChange={onChangeTab}
-                    >
-                      {ACCOUNT_TABS.map((tab) => (
-                        <Tab
-                          disableRipple
-                          key={tab.value}
-                          label={capitalCase(tab.value)}
-                          icon={tab.icon}
-                          value={tab.value}
-                        />
-                      ))}
-                    </Tabs>
+    <Page title="User Settings">
+      <Container>
+        <Box sx={{ mb: 5 }} />
+        <Card>
+          <Typography display="flex" alignItems="center" variant="h4" sx={{ margin: 2 }}>
+            <Iconify icon={'eva:settings-fill'} sx={{ fontSize: 30 }} />
+            {t('Settings')}
+          </Typography>
+        </Card>
+        <Tabs
+          allowScrollButtonsMobile
+          variant="scrollable"
+          scrollButtons="auto"
+          value={currentTab}
+          onChange={onChangeTab}
+        >
+          {ACCOUNT_TABS.map((tab) => (
+            <Tab
+              disableRipple
+              key={tab.value}
+              label={capitalCase(tab.value)}
+              icon={tab.icon}
+              value={tab.value}
+            />
+          ))}
+        </Tabs>
 
-                    <Box sx={{ mb: 1 }} />
+        <Box sx={{ mb: 1 }} />
 
-                    {ACCOUNT_TABS.map((tab) => {
-                      const isMatched = tab.value === currentTab
-                      return isMatched && <Box key={tab.value}>{tab.component}</Box>
-                    })}
-                  </Container>
-                </Page>
-              </NotistackProvider>
-            </ThemeLocalization>
-          </ThemeColorPresets>
-        </ThemeProvider>
-      </SettingsProvider>
-    </HelmetProvider>
+        {ACCOUNT_TABS.map((tab) => {
+          const isMatched = tab.value === currentTab
+          return isMatched && <Box key={tab.value}>{tab.component}</Box>
+        })}
+      </Container>
+    </Page>
   )
 }

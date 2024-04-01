@@ -6,7 +6,7 @@ import storage from 'redux-persist/lib/storage';
 import chatReducer from './slices/chat';
 // import productReducer from './slices/product';
 // import calendarReducer from './slices/calendar';
-// import kanbanReducer from './slices/kanban';
+import kanbanReducer from './slices/kanban';
 
 // ----------------------------------------------------------------------
 
@@ -28,7 +28,7 @@ const rootReducer = combineReducers({
   // mail: mailReducer,
   chat: chatReducer,
   // calendar: calendarReducer,
-  // kanban: kanbanReducer,
+  kanban: kanbanReducer,
   // product: persistReducer(productPersistConfig, productReducer),
 });
 
