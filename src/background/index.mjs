@@ -343,7 +343,7 @@ try {
     // eslint-disable-next-line no-undef
     await chrome.sidePanel.setOptions({
       tabId,
-      path: 'IndependentPanel.html',
+      path: 'chatpage.html',
       enabled: true,
     })
   })

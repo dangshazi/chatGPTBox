@@ -333,7 +333,7 @@ async function finishOutput(outputDirSuffix) {
     { src: 'src/pages/IndependentPanel/index.html', dst: 'IndependentPanel.html' },
 
     { src: 'build/chatpage.js', dst: 'chatpage.js' },
-    { src: 'build/chatpage.css', dst: 'chatpage.css' },
+    // { src: 'build/chatpage.css', dst: 'chatpage.css' },
     { src: 'src/chatpage/index.html', dst: 'chatpage.html' },
   ]
 
