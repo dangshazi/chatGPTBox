@@ -1,7 +1,7 @@
 import axios from 'axios';
 // config
-// import { HOST_API } from '../config';
-const HOST_API = 'https://api.openai.com/v1'
+import { HOST_API } from '../config';
+// const HOST_API = 'https://api.openai.com/v1'
 
 // ----------------------------------------------------------------------
 

@@ -1,4 +1,5 @@
 import archiver from 'archiver'
+import CopyWebpackPlugin from 'copy-webpack-plugin'
 import CssMinimizerPlugin from 'css-minimizer-webpack-plugin'
 import fs from 'fs-extra'
 import MiniCssExtractPlugin from 'mini-css-extract-plugin'
@@ -89,6 +90,26 @@ async function runWebpack(isWithoutKatex, isWithoutTiktoken, minimal, callback) 
       concatenateModules: !isAnalyzing,
     },
     plugins: [
+      new CopyWebpackPlugin({
+        patterns: [
+          {
+            from: 'public/icons',
+            to: 'icons',
+          },
+          {
+            from: 'public/favicon',
+            to: 'favicon',
+          },
+          // {
+          //   from: 'public/fonts',
+          //   to: 'fonts',
+          // },
+          {
+            from: 'public/logo',
+            to: 'logo',
+          },
+        ],
+      }),
       minimal
         ? undefined
         : new webpack.ProvidePlugin({
@@ -313,7 +334,14 @@ async function copyFiles(entryPoints, targetDir) {
  */
 async function finishOutput(outputDirSuffix) {
   // list all files in build folder
-  const filesInBuildDir = await fs.readdir('build')
+  const buildDirectory = 'build'
+  const filesInBuildDir = await fs.readdir(buildDirectory, { recursive: false }).then((files) =>
+    files.filter((file) => {
+      // return !fs.statSync(path.join(buildDirectory, file)).isDirectory()
+      // file name is not chromium or firefox
+      return !file.includes('chromium') && !file.includes('firefox')
+    }),
+  )
   // parse filesInBuildDir into array of objects which contains src and dst
   const buildedFiles = filesInBuildDir.map((file) => ({ src: `build/${file}`, dst: file }))
 
@@ -325,22 +353,19 @@ async function finishOutput(outputDirSuffix) {
     { src: 'src/options/index.html', dst: 'options.html' },
     { src: 'src/pages/IndependentPanel/index.html', dst: 'IndependentPanel.html' },
     { src: 'src/chatpage/index.html', dst: 'chatpage.html' },
+    // { src: 'public/favicon', dst: 'favicon' },
+    // { src: 'public/icons', dst: 'icons' },
+    // { src: 'public/logo', dst: 'logo' },
   ]
 
   // chromium
   const chromiumOutputDir = `./${outdir}/chromium${outputDirSuffix}`
-  await copyFiles(
-    [...commonFiles, { src: 'src/manifest.json', dst: 'manifest.json' }],
-    chromiumOutputDir,
-  )
+  await copyFiles([...commonFiles, { src: 'src/fonts', dst: 'fonts' }], chromiumOutputDir)
   if (isProduction) await zipFolder(chromiumOutputDir)
 
   // firefox
   const firefoxOutputDir = `./${outdir}/firefox${outputDirSuffix}`
-  await copyFiles(
-    [...commonFiles, { src: 'src/manifest.v2.json', dst: 'manifest.json' }],
-    firefoxOutputDir,
-  )
+  await copyFiles([...commonFiles, { src: 'src/manifest.v2.json', dst: 'fonts' }], firefoxOutputDir)
   if (isProduction) await zipFolder(firefoxOutputDir)
 }
 

@@ -3,8 +3,8 @@ import { useEffect } from 'react';
 // @mui
 import { Card, Container } from '@mui/material';
 // redux
-import { useDispatch } from '../redux/store';
 import { getContacts, getConversations } from '../redux/slices/chat';
+import { useDispatch } from '../redux/store'
 
 
 // routes
