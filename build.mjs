@@ -312,28 +312,18 @@ async function copyFiles(entryPoints, targetDir) {
  * @return {Promise<void>} a Promise that resolves when the output files are generated
  */
 async function finishOutput(outputDirSuffix) {
+  // list all files in build folder
+  const filesInBuildDir = await fs.readdir('build')
+  // parse filesInBuildDir into array of objects which contains src and dst
+  const buildedFiles = filesInBuildDir.map((file) => ({ src: `build/${file}`, dst: file }))
+
   const commonFiles = [
+    ...buildedFiles,
     { src: 'src/logo.png', dst: 'logo.png' },
     { src: 'src/rules.json', dst: 'rules.json' },
-
-    { src: 'build/shared.js', dst: 'shared.js' },
-    { src: 'build/content-script.css', dst: 'content-script.css' }, // shared
-
-    { src: 'build/content-script.js', dst: 'content-script.js' },
-
-    { src: 'build/background.js', dst: 'background.js' },
-
-    { src: 'build/popup.js', dst: 'popup.js' },
-    { src: 'build/popup.css', dst: 'popup.css' },
     { src: 'src/popup/index.html', dst: 'popup.html' },
-
-    { src: 'build/options.js', dst: 'options.js' },
     { src: 'src/options/index.html', dst: 'options.html' },
-    { src: 'build/IndependentPanel.js', dst: 'IndependentPanel.js' },
     { src: 'src/pages/IndependentPanel/index.html', dst: 'IndependentPanel.html' },
-
-    { src: 'build/chatpage.js', dst: 'chatpage.js' },
-    // { src: 'build/chatpage.css', dst: 'chatpage.css' },
     { src: 'src/chatpage/index.html', dst: 'chatpage.html' },
   ]
 

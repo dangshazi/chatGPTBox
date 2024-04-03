@@ -1,3 +1,4 @@
+/* eslint-disable react/no-unescaped-entities */
 import { m } from 'framer-motion';
 // @mui
 import { Button, Typography, TextField, Stack } from '@mui/material';

@@ -1,3 +1,4 @@
+/* eslint-disable react/no-unescaped-entities */
 // @mui
 import { styled } from '@mui/material/styles';
 import { Box, Grid, Container, Typography } from '@mui/material';
