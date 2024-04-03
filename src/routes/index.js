@@ -52,13 +52,22 @@ export default function Router() {
     //     { path: 'verify', element: <VerifyCode /> },
     //   ],
     // },
-
+    {
+      path: '/',
+      element: <MainLayout />,
+      children: [
+        { element: <HomePage />, index: true },
+        { path: 'about-us', element: <About /> },
+        { path: 'contact-us', element: <Contact /> },
+        { path: 'faqs', element: <Faqs /> },
+      ],
+    },
     // Dashboard Routes
     {
       path: 'dashboard',
       element: (
         // <AuthGuard>
-          <DashboardLayout />
+        <DashboardLayout />
         // </AuthGuard>
       ),
       children: [
@@ -149,16 +158,7 @@ export default function Router() {
         { path: '*', element: <Navigate to="/404" replace /> },
       ],
     },
-    {
-      path: '/',
-      element: <MainLayout />,
-      children: [
-        { element: <HomePage />, index: true },
-        { path: 'about-us', element: <About /> },
-        { path: 'contact-us', element: <Contact /> },
-        { path: 'faqs', element: <Faqs /> },
-      ],
-    },
+
     { path: '*', element: <Navigate to="/404" replace /> },
   ])
 }

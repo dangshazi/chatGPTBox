@@ -1,5 +1,5 @@
 // routes
-import { PATH_DASHBOARD } from './routes/paths';
+import { PATH_DASHBOARD } from './routes/paths'
 
 // // API
 // // ----------------------------------------------------------------------
@@ -30,7 +30,7 @@ import { PATH_DASHBOARD } from './routes/paths';
 // export const MAPBOX_API = process.env.REACT_APP_MAPBOX
 
 // ROOT PATH AFTER LOGIN SUCCESSFUL
-export const PATH_AFTER_LOGIN = PATH_DASHBOARD.chat.root; // as '/dashboard/app'
+export const PATH_AFTER_LOGIN = PATH_DASHBOARD.chat.root // as '/dashboard/app'
 
 // LAYOUT
 // ----------------------------------------------------------------------
