@@ -1,6 +1,6 @@
 import Browser from 'webextension-polyfill'
-import { initSession } from './init-session.mjs'
 import { getUserConfig } from '../config/index.mjs'
+import { initSession } from './init-session.mjs'
 
 export const initDefaultSession = async () => {
   const config = await getUserConfig()
@@ -66,6 +66,7 @@ export const resetSessions = async () => {
   return currentSessions
 }
 
+// sessions 存储在 local storage中
 export const getSessions = async () => {
   const { sessions } = await Browser.storage.local.get('sessions')
   if (sessions && sessions.length > 0) return sessions

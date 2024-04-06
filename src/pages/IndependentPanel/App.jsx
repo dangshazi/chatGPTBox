@@ -1,28 +1,31 @@
-import {
-  createSession,
-  resetSessions,
-  getSessions,
-  updateSession,
-  getSession,
-  deleteSession,
-} from '../../services/local-session.mjs'
+import FileSaver from 'file-saver'
 import { useEffect, useRef, useState } from 'react'
-import './styles.scss'
-import { useConfig } from '../../hooks/use-config.mjs'
 import { useTranslation } from 'react-i18next'
+import Browser from 'webextension-polyfill'
 import ConfirmButton from '../../components/ConfirmButton'
 import ConversationCard from '../../components/ConversationCard'
 import DeleteButton from '../../components/DeleteButton'
+import { useConfig } from '../../hooks/use-config.mjs'
+import {
+  createSession,
+  deleteSession,
+  getSession,
+  getSessions,
+  resetSessions,
+  updateSession,
+} from '../../services/local-session.mjs'
 import { openUrl } from '../../utils/index.mjs'
-import Browser from 'webextension-polyfill'
-import FileSaver from 'file-saver'
+import './styles.scss'
 
 function App() {
   const { t } = useTranslation()
   const [collapsed, setCollapsed] = useState(true)
   const config = useConfig(null, false)
+  // 所有的session
   const [sessions, setSessions] = useState([])
+  // 当前chat window中的sessionId
   const [sessionId, setSessionId] = useState(null)
+  // 当前chat window中的session
   const [currentSession, setCurrentSession] = useState(null)
   const [renderContent, setRenderContent] = useState(false)
   const currentPort = useRef(null)
@@ -37,6 +40,7 @@ function App() {
       }
       currentPort.current = null
     }
+    // 注意这里并没有直接改session，而是改的sessionId. session 是通过useEffect去获取的，而sessionId是通过useState去设置的
     const { session, currentSessions } = await getSession(sessionId)
     if (session) setSessionId(sessionId)
     else if (currentSessions.length > 0) setSessionId(currentSessions[0].sessionId)
@@ -68,6 +72,7 @@ function App() {
     if ('sessions' in config && config['sessions']) setSessions(config['sessions'])
   }, [config])
 
+  // 配置session
   useEffect(() => {
     // eslint-disable-next-line
     ;(async () => {
