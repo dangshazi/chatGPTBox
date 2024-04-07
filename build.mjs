@@ -360,12 +360,22 @@ async function finishOutput(outputDirSuffix) {
 
   // chromium
   const chromiumOutputDir = `./${outdir}/chromium${outputDirSuffix}`
-  await copyFiles([...commonFiles, { src: 'src/fonts', dst: 'fonts' }], chromiumOutputDir)
+  await copyFiles(
+    [
+      ...commonFiles,
+      { src: 'src/fonts', dst: 'fonts' },
+      { src: 'src/manifest.json', dst: 'manifest.json' },
+    ],
+    chromiumOutputDir,
+  )
   if (isProduction) await zipFolder(chromiumOutputDir)
 
   // firefox
   const firefoxOutputDir = `./${outdir}/firefox${outputDirSuffix}`
-  await copyFiles([...commonFiles, { src: 'src/manifest.v2.json', dst: 'fonts' }], firefoxOutputDir)
+  await copyFiles(
+    [...commonFiles, { src: 'src/manifest.v2.json', dst: 'manifest.json' }],
+    firefoxOutputDir,
+  )
   if (isProduction) await zipFolder(firefoxOutputDir)
 }
 

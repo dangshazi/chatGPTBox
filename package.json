@@ -70,6 +70,7 @@
     "react-redux": "^7.2.6",
     "@reduxjs/toolkit": "^1.8.0",
     "react-router-dom": "^6.2.2",
+    "simplebar": "^5.3.6",
     "simplebar-react": "^2.3.6",
     "@hookform/resolvers": "^2.8.8",
     "yup": "^0.32.11",
