@@ -51,9 +51,10 @@ export default function ChatConversationList({ conversations, isOpenSidebar, act
             onSelectConversation={() => handleSelectConversation(conversationId)}
           />
         ) : (
+          // 没有加载成功时展示
           <SkeletonConversationItem key={index} />
-        )
+        ),
       )}
     </List>
-  );
+  )
 }

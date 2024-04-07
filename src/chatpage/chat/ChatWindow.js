@@ -1,25 +1,25 @@
 import { useEffect } from 'react';
-import { useNavigate, useParams, useLocation } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom'
 // @mui
 import { Box, Divider, Stack } from '@mui/material';
 // redux
-import { useDispatch, useSelector } from '../../redux/store';
 import {
   addRecipients,
-  onSendMessage,
   getConversation,
   getParticipants,
   markConversationAsRead,
+  onSendMessage,
   resetActiveConversation,
-} from '../../redux/slices/chat';
+} from '../../redux/slices/chat'
+import { useDispatch, useSelector } from '../../redux/store'
 // routes
 import { PATH_DASHBOARD } from '../../routes/paths';
 //
-import ChatRoom from './ChatRoom';
-import ChatMessageList from './ChatMessageList';
+import ChatHeaderCompose from './ChatHeaderCompose'
 import ChatHeaderDetail from './ChatHeaderDetail';
 import ChatMessageInput from './ChatMessageInput';
-import ChatHeaderCompose from './ChatHeaderCompose';
+import ChatMessageList from './ChatMessageList'
+import ChatRoom from './ChatRoom'
 
 // ----------------------------------------------------------------------
 
@@ -102,6 +102,7 @@ export default function ChatWindow() {
 
       <Box sx={{ flexGrow: 1, display: 'flex', overflow: 'hidden' }}>
         <Stack sx={{ flexGrow: 1 }}>
+          {/* 主要聊天内容 */}
           <ChatMessageList conversation={conversation} />
 
           <Divider />
@@ -113,8 +114,11 @@ export default function ChatWindow() {
           />
         </Stack>
 
-        {mode === 'DETAIL' && <ChatRoom conversation={conversation} participants={displayParticipants} />}
+        {/* 对话右侧的详细信息 */}
+        {mode === 'DETAIL' && (
+          <ChatRoom conversation={conversation} participants={displayParticipants} />
+        )}
       </Box>
     </Stack>
-  );
+  )
 }

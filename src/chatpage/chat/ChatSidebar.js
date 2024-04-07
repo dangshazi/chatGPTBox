@@ -150,6 +150,7 @@ export default function ChatSidebar() {
             />
           </IconButton>
 
+          {/* 新建聊天对话 */}
           {!isCollapse && (
             <IconButton onClick={() => navigate(PATH_DASHBOARD.chat.new)}>
               <Iconify icon={'eva:edit-fill'} width={20} height={20} />
@@ -168,6 +169,7 @@ export default function ChatSidebar() {
       </Box>
       {/* 对话列表 */}
       <Scrollbar>
+        {/* 搜索结果页面跟聊天列表页面完全不同 */}
         {!displayResults ? (
           <ChatConversationList
             conversations={conversations}
@@ -176,11 +178,15 @@ export default function ChatSidebar() {
             sx={{ ...(isSearchFocused && { display: 'none' }) }}
           />
         ) : (
-          <ChatSearchResults query={searchQuery} results={searchResults} onSelectContact={handleSelectContact} />
+          <ChatSearchResults
+            query={searchQuery}
+            results={searchResults}
+            onSelectContact={handleSelectContact}
+          />
         )}
       </Scrollbar>
     </>
-  );
+  )
 
   return (
     <>
@@ -190,6 +196,7 @@ export default function ChatSidebar() {
         </ToggleButtonStyle>
       )}
 
+      {/* 侧边栏的展示drawer在不同的情况下不一致 */}
       {isDesktop ? (
         <Drawer
           open={openSidebar}
@@ -227,5 +234,5 @@ export default function ChatSidebar() {
         </Drawer>
       )}
     </>
-  );
+  )
 }

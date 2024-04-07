@@ -1,20 +1,20 @@
-import PropTypes from 'prop-types';
-import { formatDistanceToNowStrict } from 'date-fns';
+import { formatDistanceToNowStrict } from 'date-fns'
+import PropTypes from 'prop-types'
 // @mui
-import { styled } from '@mui/material/styles';
-import { Box, Avatar, ListItemText, ListItemAvatar, ListItemButton } from '@mui/material';
+import { Avatar, Box, ListItemAvatar, ListItemButton, ListItemText } from '@mui/material'
+import { styled } from '@mui/material/styles'
 //
-import BadgeStatus from '../../components/BadgeStatus';
+import BadgeStatus from '../../components/BadgeStatus'
 
 // ----------------------------------------------------------------------
 
-const AVATAR_SIZE = 48;
-const AVATAR_SIZE_GROUP = 32;
+const AVATAR_SIZE = 48
+const AVATAR_SIZE_GROUP = 32
 
 const RootStyle = styled(ListItemButton)(({ theme }) => ({
   padding: theme.spacing(1.5, 3),
   transition: theme.transitions.create('all'),
-}));
+}))
 
 const AvatarWrapperStyle = styled('div')({
   position: 'relative',
@@ -22,38 +22,48 @@ const AvatarWrapperStyle = styled('div')({
   height: AVATAR_SIZE,
   '& .MuiAvatar-img': { borderRadius: '50%' },
   '& .MuiAvatar-root': { width: '100%', height: '100%' },
-});
+})
 
 // ----------------------------------------------------------------------
 
 const getDetails = (conversation, currentUserId) => {
-  const otherParticipants = conversation.participants.filter((participant) => participant.id !== currentUserId);
-  const displayNames = otherParticipants.reduce((names, participant) => [...names, participant.name], []).join(', ');
-  let displayText = '';
-  const lastMessage = conversation.messages[conversation.messages.length - 1];
+  const otherParticipants = conversation.participants.filter(
+    (participant) => participant.id !== currentUserId,
+  )
+  const displayNames = otherParticipants
+    .reduce((names, participant) => [...names, participant.name], [])
+    .join(', ')
+  let displayText = ''
+  const lastMessage = conversation.messages[conversation.messages.length - 1]
   if (lastMessage) {
-    const sender = lastMessage.senderId === currentUserId ? 'You: ' : '';
-    const message = lastMessage.contentType === 'image' ? 'Sent a photo' : lastMessage.body;
-    displayText = `${sender}${message}`;
+    const sender = lastMessage.senderId === currentUserId ? 'You: ' : ''
+    const message = lastMessage.contentType === 'image' ? 'Sent a photo' : lastMessage.body
+    displayText = `${sender}${message}`
   }
-  return { otherParticipants, displayNames, displayText };
-};
+  return { otherParticipants, displayNames, displayText }
+}
 
 ChatConversationItem.propTypes = {
   isSelected: PropTypes.bool,
   conversation: PropTypes.object.isRequired,
   isOpenSidebar: PropTypes.bool,
   onSelectConversation: PropTypes.func,
-};
+}
 
-export default function ChatConversationItem({ isSelected, conversation, isOpenSidebar, onSelectConversation }) {
-  const details = getDetails(conversation, '8864c717-587d-472a-929a-8e5f298024da-0');
+export default function ChatConversationItem({
+  isSelected,
+  conversation,
+  isOpenSidebar,
+  onSelectConversation,
+}) {
+  const details = getDetails(conversation, '8864c717-587d-472a-929a-8e5f298024da-0')
 
-  const displayLastActivity = conversation.messages[conversation.messages.length - 1].createdAt;
+  const displayLastActivity = conversation.messages[conversation.messages.length - 1].createdAt
 
-  const isGroup = details.otherParticipants.length > 1;
-  const isUnread = conversation.unreadCount > 0;
-  const isOnlineGroup = isGroup && details.otherParticipants.map((item) => item.status).includes('online');
+  const isGroup = details.otherParticipants.length > 1
+  const isUnread = conversation.unreadCount > 0
+  const isOnlineGroup =
+    isGroup && details.otherParticipants.map((item) => item.status).includes('online')
 
   return (
     <RootStyle
@@ -62,6 +72,7 @@ export default function ChatConversationItem({ isSelected, conversation, isOpenS
         ...(isSelected && { bgcolor: 'action.selected' }),
       }}
     >
+      {/* 头像 */}
       <ListItemAvatar>
         <Box
           sx={{
@@ -90,15 +101,21 @@ export default function ChatConversationItem({ isSelected, conversation, isOpenS
             <AvatarWrapperStyle className="avatarWrapper" key={participant.id}>
               <Avatar alt={participant.name} src={participant.avatar} />
               {!isGroup && (
-                <BadgeStatus status={participant.status} sx={{ right: 2, bottom: 2, position: 'absolute' }} />
+                <BadgeStatus
+                  status={participant.status}
+                  sx={{ right: 2, bottom: 2, position: 'absolute' }}
+                />
               )}
             </AvatarWrapperStyle>
           ))}
 
-          {isOnlineGroup && <BadgeStatus status="online" sx={{ right: 2, bottom: 2, position: 'absolute' }} />}
+          {isOnlineGroup && (
+            <BadgeStatus status="online" sx={{ right: 2, bottom: 2, position: 'absolute' }} />
+          )}
         </Box>
       </ListItemAvatar>
 
+      {/* 对话内容细节和讨论的人群 */}
       {isOpenSidebar && (
         <>
           <ListItemText
@@ -142,5 +159,5 @@ export default function ChatConversationItem({ isSelected, conversation, isOpenS
         </>
       )}
     </RootStyle>
-  );
+  )
 }
