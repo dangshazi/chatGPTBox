@@ -1,9 +1,9 @@
 // api version
 
+import { isEmpty } from 'lodash-es'
 import { Models, getUserConfig } from '../../config/index.mjs'
 import { fetchSSE } from '../../utils/fetch-sse.mjs'
 import { getConversationPairs } from '../../utils/get-conversation-pairs.mjs'
-import { isEmpty } from 'lodash-es'
 import {
   getChatSystemPromptBase,
   getCompletionPromptBase,
@@ -100,6 +100,7 @@ export async function generateAnswersWithGptCompletionApi(
 }
 
 /**
+ * 这个只给chatgpt api 使用
  * @param {Browser.Runtime.Port} port
  * @param {string} question
  * @param {Session} session
@@ -118,6 +119,7 @@ export async function generateAnswersWithChatgptApi(port, question, session, api
   )
 }
 
+// moonshot api也使用这个方法
 export async function generateAnswersWithChatgptApiCompat(
   baseUrl,
   port,
@@ -126,9 +128,11 @@ export async function generateAnswersWithChatgptApiCompat(
   apiKey,
   modelName,
 ) {
+  // AbortController 是 Web API 的一部分，提供了一种在请求发送后能够中止（abort）这些请求的机制。这个接口是 Fetch API 的补充，允许开发者在不需要的请求上取消操作，从而节省资源，提高应用程序的性能和响应速度。
   const { controller, messageListener, disconnectListener } = setAbortController(port)
 
   const config = await getUserConfig()
+  // 这里prompt是个数组，一共三个角色：system，user，assistant
   const prompt = getConversationPairs(
     session.conversationRecords.slice(-config.maxConversationContextLength),
     false,
@@ -146,6 +150,7 @@ export async function generateAnswersWithChatgptApiCompat(
   }
   await fetchSSE(`${baseUrl}/v1/chat/completions`, {
     method: 'POST',
+    // stopController
     signal: controller.signal,
     headers: {
       'Content-Type': 'application/json',
@@ -154,10 +159,13 @@ export async function generateAnswersWithChatgptApiCompat(
     body: JSON.stringify({
       messages: prompt,
       model: Models[modelName].value,
+      // socket请求
       stream: true,
       max_tokens: config.maxResponseTokenLength,
       temperature: config.temperature,
     }),
+
+    // SSE的主要业务处理逻辑
     onMessage(message) {
       console.debug('sse message', message)
       if (finished) return
@@ -173,6 +181,7 @@ export async function generateAnswersWithChatgptApiCompat(
         return
       }
 
+      // 下面是主要处理逻辑：
       const delta = data.choices[0]?.delta?.content
       const content = data.choices[0]?.message?.content
       const text = data.choices[0]?.text
@@ -192,6 +201,7 @@ export async function generateAnswersWithChatgptApiCompat(
     },
     async onStart() {},
     async onEnd() {
+      // 对应msg.done的处理逻辑
       port.postMessage({ done: true })
       port.onMessage.removeListener(messageListener)
       port.onDisconnect.removeListener(disconnectListener)

@@ -288,6 +288,7 @@ Browser.runtime.onMessage.addListener(async (message, sender) => {
   }
 })
 
+// 变更HTTP请求来满足不同网络的需求
 try {
   // open-ai related:获取arkose的req url和form
   Browser.webRequest.onBeforeRequest.addListener(

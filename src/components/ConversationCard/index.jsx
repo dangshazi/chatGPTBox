@@ -92,6 +92,7 @@ function ConversationCard(props) {
     if (props.onUpdate) props.onUpdate(port, session, conversationItemDataArray)
   }, [session, conversationItemDataArray])
 
+  // 更新UI的逻辑
   useEffect(() => {
     const { offsetHeight, scrollHeight, scrollTop } = bodyRef.current
     if (
@@ -115,6 +116,7 @@ function ConversationCard(props) {
   }, [props.question]) // usually only triggered once
 
   /**
+   * 用于更新未完成的answer
    * @param {string} value
    * @param {boolean} appended
    * @param {'question'|'answer'|'error'} newType
@@ -135,7 +137,7 @@ function ConversationCard(props) {
     })
   }
 
-  // background message process logic
+  // current page process message from background
   const portMessageListener = (msg) => {
     // append fragment of answer when use socket
     if (msg.answer) {
@@ -207,6 +209,7 @@ function ConversationCard(props) {
   const foregroundMessageListeners = useRef([])
 
   /**
+   * 用来给background发消息的逻辑
    * @param {Session|undefined} session
    * @param {boolean|undefined} stop
    */
@@ -289,6 +292,7 @@ function ConversationCard(props) {
     }
   }, [conversationItemDataArray])
 
+  // 更换model后的重试
   const getRetryFn = (session) => async () => {
     updateAnswer(`<p class="gpt-loading">${t('Waiting for response...')}</p>`, false, 'answer')
     setIsReady(false)

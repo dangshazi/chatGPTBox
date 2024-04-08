@@ -1,3 +1,5 @@
+import { t } from 'i18next'
+import Browser from 'webextension-polyfill'
 import {
   bingWebModelKeys,
   claudeWebModelKeys,
@@ -6,8 +8,6 @@ import {
   Models,
   setAccessToken,
 } from '../config/index.mjs'
-import Browser from 'webextension-polyfill'
-import { t } from 'i18next'
 
 /**
  * Retrieves or generates a GPT access token for the chat application.
@@ -117,7 +117,7 @@ export function registerPortListener(executor) {
       const config = await getUserConfig()
       if (!session.modelName) session.modelName = config.modelName
       if (!session.aiName) session.aiName = Models[session.modelName].desc
-      // 为什么要把session发回去？
+      // 为什么要把session发回去？感觉就是为了测试一下链路是否通畅
       port.postMessage({ session })
       try {
         await executor(session, port, config)

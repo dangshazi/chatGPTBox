@@ -17,6 +17,8 @@ export const getCustomApiPromptBase = async () => {
 
 export function setAbortController(port, onStop, onDisconnect) {
   const controller = new AbortController()
+
+  // 接收到stop命令后停止
   const messageListener = (msg) => {
     if (msg.stop) {
       port.onMessage.removeListener(messageListener)
@@ -28,6 +30,7 @@ export function setAbortController(port, onStop, onDisconnect) {
   }
   port.onMessage.addListener(messageListener)
 
+  // port断开后停止
   const disconnectListener = () => {
     port.onDisconnect.removeListener(disconnectListener)
     console.debug('port disconnected')
