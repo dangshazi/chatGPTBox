@@ -5,8 +5,8 @@ import LogoOnlyLayout from '../layouts/LogoOnlyLayout';
 import DashboardLayout from '../layouts/dashboard'
 import MainLayout from '../layouts/main'
 // guards
-// import AuthGuard from '../guards/AuthGuard'
-// import GuestGuard from '../guards/GuestGuard'
+import AuthGuard from '../guards/AuthGuard'
+import GuestGuard from '../guards/GuestGuard'
 // import RoleBasedGuard from '../guards/RoleBasedGuard';
 // config
 import { PATH_AFTER_LOGIN } from '../config';
@@ -27,31 +27,31 @@ const Loadable = (Component) => (props) => {
 
 export default function Router() {
   return useRoutes([
-    // {
-    //   path: 'auth',
-    //   children: [
-    //     {
-    //       path: 'login',
-    //       element: (
-    //         <GuestGuard>
-    //           <Login />
-    //         </GuestGuard>
-    //       ),
-    //     },
-    //     {
-    //       path: 'register',
-    //       element: (
-    //         <GuestGuard>
-    //           <Register />
-    //         </GuestGuard>
-    //       ),
-    //     },
-    //     { path: 'login-unprotected', element: <Login /> },
-    //     { path: 'register-unprotected', element: <Register /> },
-    //     { path: 'reset-password', element: <ResetPassword /> },
-    //     { path: 'verify', element: <VerifyCode /> },
-    //   ],
-    // },
+    {
+      path: 'auth',
+      children: [
+        {
+          path: 'login',
+          element: (
+            <GuestGuard>
+              <Login />
+            </GuestGuard>
+          ),
+        },
+        {
+          path: 'register',
+          element: (
+            <GuestGuard>
+              <Register />
+            </GuestGuard>
+          ),
+        },
+        { path: 'login-unprotected', element: <Login /> },
+        { path: 'register-unprotected', element: <Register /> },
+        { path: 'reset-password', element: <ResetPassword /> },
+        { path: 'verify', element: <VerifyCode /> },
+      ],
+    },
     {
       path: '/',
       element: <MainLayout />,
@@ -66,9 +66,9 @@ export default function Router() {
     {
       path: 'dashboard',
       element: (
-        // <AuthGuard>
-        <DashboardLayout />
-        // </AuthGuard>
+        <AuthGuard>
+          <DashboardLayout />
+        </AuthGuard>
       ),
       children: [
         { element: <Navigate to={PATH_AFTER_LOGIN} replace />, index: true },
@@ -163,11 +163,11 @@ export default function Router() {
   ])
 }
 
-// // AUTHENTICATION
-// const Login = Loadable(lazy(() => import('../pages/auth/Login')));
-// const Register = Loadable(lazy(() => import('../pages/auth/Register')));
-// const ResetPassword = Loadable(lazy(() => import('../pages/auth/ResetPassword')));
-// const VerifyCode = Loadable(lazy(() => import('../pages/auth/VerifyCode')));
+// AUTHENTICATION
+const Login = Loadable(lazy(() => import('../pages/auth/Login')));
+const Register = Loadable(lazy(() => import('../pages/auth/Register')));
+const ResetPassword = Loadable(lazy(() => import('../pages/auth/ResetPassword')));
+const VerifyCode = Loadable(lazy(() => import('../pages/auth/VerifyCode')));
 
 // // DASHBOARD
 

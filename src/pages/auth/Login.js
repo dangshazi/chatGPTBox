@@ -1,8 +1,8 @@
-import { capitalCase } from 'change-case';
+// import { capitalCase } from 'change-case';
 import { Link as RouterLink } from 'react-router-dom';
 // @mui
 import { styled } from '@mui/material/styles';
-import { Box, Card, Stack, Link, Alert, Tooltip, Container, Typography } from '@mui/material';
+import { Box, Card, Stack, Link, Alert, Container, Typography } from '@mui/material';
 // routes
 import { PATH_AUTH } from '../../routes/paths';
 // hooks
@@ -106,15 +106,16 @@ export default function Login() {
                 <Typography sx={{ color: 'text.secondary' }}>Enter your details below.</Typography>
               </Box>
 
-              <Tooltip title={capitalCase(method)} placement="right">
-                <>
+              {/* UI BUG */}
+              {/* <Tooltip title={capitalCase(method)} placement="right">
+                <> */}
                   <Image
                     disabledEffect
                     src={`https://minimal-assets-api.vercel.app/assets/icons/auth/ic_${method}.png`}
                     sx={{ width: 32, height: 32 }}
                   />
-                </>
-              </Tooltip>
+                {/* </>
+              </Tooltip> */}
             </Stack>
 
             <Alert severity="info" sx={{ mb: 3 }}>
