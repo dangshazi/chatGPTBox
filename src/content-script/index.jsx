@@ -1,10 +1,11 @@
-import './styles.scss'
-import { unmountComponentAtNode } from 'react-dom'
+import { changeLanguage } from 'i18next'
 import { render } from 'preact'
+import { unmountComponentAtNode } from 'react-dom'
+import Browser from 'webextension-polyfill'
+import '../_locales/i18n-react'
 import DecisionCard from '../components/DecisionCard'
-import { config as siteConfig } from './site-adapters'
-import { config as toolsConfig } from './selection-tools'
-import { config as menuConfig } from './menu-tools'
+import FloatingToolbar from '../components/FloatingToolbar'
+import NotificationForChatGPTWeb from '../components/NotificationForChatGPTWeb'
 import {
   chatgptWebModelKeys,
   getPreferredLanguageKey,
@@ -12,21 +13,20 @@ import {
   setAccessToken,
   setUserConfig,
 } from '../config/index.mjs'
+import { getPreferredLanguage } from '../config/language.mjs'
+import { generateAnswersWithChatgptWebApi } from '../services/apis/chatgpt-web.mjs'
+import { initSession } from '../services/init-session.mjs'
+import { getChatGptAccessToken, registerPortListener } from '../services/wrappers.mjs'
 import {
   createElementAtPosition,
   cropText,
   getClientPosition,
   getPossibleElementByQuerySelector,
 } from '../utils'
-import FloatingToolbar from '../components/FloatingToolbar'
-import Browser from 'webextension-polyfill'
-import { getPreferredLanguage } from '../config/language.mjs'
-import '../_locales/i18n-react'
-import { changeLanguage } from 'i18next'
-import { initSession } from '../services/init-session.mjs'
-import { getChatGptAccessToken, registerPortListener } from '../services/wrappers.mjs'
-import { generateAnswersWithChatgptWebApi } from '../services/apis/chatgpt-web.mjs'
-import NotificationForChatGPTWeb from '../components/NotificationForChatGPTWeb'
+import { config as menuConfig } from './menu-tools'
+import { config as toolsConfig } from './selection-tools'
+import { config as siteConfig } from './site-adapters'
+import './styles.scss'
 
 /**
  * @param {SiteConfig} siteConfig
@@ -219,6 +219,7 @@ async function prepareForSelectionToolsTouch() {
 
 let menuX, menuY
 
+// 这是FloatingToolbar
 async function prepareForRightClickMenu() {
   document.addEventListener('contextmenu', (e) => {
     menuX = e.clientX
@@ -258,8 +259,10 @@ async function prepareForRightClickMenu() {
   })
 }
 
+// 静态卡片看起来不是悬浮的对话框
 async function prepareForStaticCard() {
   const userConfig = await getUserConfig()
+  // 判断是否开启静态卡片
   let siteRegex
   if (userConfig.useSiteRegexOnly) siteRegex = userConfig.siteRegex
   else
@@ -268,6 +271,7 @@ async function prepareForStaticCard() {
     )
 
   const matches = location.hostname.match(siteRegex)
+  // 如果开启了静态卡片
   if (matches) {
     const siteName = matches[0]
 
@@ -278,6 +282,7 @@ async function prepareForStaticCard() {
       return
 
     let initSuccess = true
+    // 将site-adapters中的注入action进行执行
     if (siteName in siteConfig) {
       const siteAction = siteConfig[siteName].action
       if (siteAction && siteAction.init) {
@@ -287,8 +292,10 @@ async function prepareForStaticCard() {
 
     if (initSuccess) mountComponent(siteConfig[siteName], userConfig)
   }
+  // 如果开启了静态卡片，但是当前不在静态卡片域名中，直接返回
 }
 
+// overwrite kimi.moonshot.cn & chat.openai.com token
 async function overwriteAccessToken() {
   if (location.hostname !== 'chatgpt.com') {
     if (location.hostname === 'kimi.moonshot.cn') {
@@ -299,6 +306,7 @@ async function overwriteAccessToken() {
     return
   }
 
+  // chat.openai.com token
   let data
   if (location.pathname === '/api/auth/session') {
     const response = document.querySelector('pre').textContent
@@ -318,18 +326,21 @@ async function overwriteAccessToken() {
 }
 
 async function prepareForForegroundRequests() {
+  // 一定是chat.openai.com 才能继续执行下面的逻辑
   if (location.hostname !== 'chatgpt.com' || location.pathname === '/auth/login') return
 
   const userConfig = await getUserConfig()
 
   if (!chatgptWebModelKeys.some((model) => userConfig.activeApiModes.includes(model))) return
 
+  // 当前使用的是 chatgpt web 的话
   if (chatgptWebModelKeys.includes(userConfig.modelName)) {
     const div = document.createElement('div')
     document.body.append(div)
     render(<NotificationForChatGPTWeb container={div} />, div)
   }
 
+  // 主动输入一个对话
   if (location.pathname === '/') {
     const input = document.querySelector('#prompt-textarea')
     if (input) {
@@ -341,12 +352,13 @@ async function prepareForForegroundRequests() {
       }, 300)
     }
   }
-
+  //用来记录chatgptTabId，之后用于通信
   await Browser.runtime.sendMessage({
     type: 'SET_CHATGPT_TAB',
     data: {},
   })
 
+  // 当前使用的是 chatgpt web 的话，为chatgpt web tab注册一个port listener
   registerPortListener(async (session, port) => {
     if (chatgptWebModelKeys.includes(session.modelName)) {
       const accessToken = await getChatGptAccessToken()

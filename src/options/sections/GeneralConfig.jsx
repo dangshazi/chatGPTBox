@@ -222,7 +222,7 @@ export function GeneralConfig({ config, updateConfig }) {
               <InputLabel id="clickIconAction">{t('When Icon Clicked')}</InputLabel>
               <Select
                 fullWidth
-                disabled
+                // disabled
                 labelId="clickIconAction"
                 name="clickIconAction"
                 label="ClickIconAction"

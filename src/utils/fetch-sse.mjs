@@ -1,6 +1,7 @@
 import { createParser } from './eventsource-parser.mjs'
 
 // Server-Sent Events（SSE）是一种允许服务器主动向客户端发送事件的技术。与传统的HTTP请求不同，SSE在客户端建立一个到服务器的单向连接，服务器可以通过这个连接发送消息给客户端，而客户端不能通过这个连接发送消息回服务器（与WebSocket相比，WebSocket是全双工的）
+// https://www.ruanyifeng.com/blog/2017/05/server-sent_events.html
 export async function fetchSSE(resource, options) {
   const { onMessage, onStart, onEnd, onError, ...fetchOptions } = options
   const resp = await fetch(resource, fetchOptions).catch(async (err) => {
