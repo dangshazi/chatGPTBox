@@ -22,6 +22,7 @@ const initialState = {
   colorOption: [],
 };
 
+// 1. 先创建一个context
 const SettingsContext = createContext(initialState);
 
 // ----------------------------------------------------------------------
@@ -30,6 +31,7 @@ SettingsProvider.propTypes = {
   children: PropTypes.node,
 };
 
+// 学习provider 模式的样板
 function SettingsProvider({ children }) {
   const [settings, setSettings] = useLocalStorage('settings', {
     themeMode: initialState.themeMode,
@@ -92,6 +94,7 @@ function SettingsProvider({ children }) {
   };
 
   return (
+    // 2. 返回Context.Provider
     <SettingsContext.Provider
       value={{
         ...settings,
@@ -117,8 +120,9 @@ function SettingsProvider({ children }) {
     >
       {children}
     </SettingsContext.Provider>
-  );
+  )
 }
 
+// 3. useSettings hooks 返回 SettingsContext 的值
 export { SettingsContext, SettingsProvider };
 
