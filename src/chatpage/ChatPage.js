@@ -15,6 +15,7 @@ import useSettings from '../hooks/useSettings';
 // import HeaderBreadcrumbs from '../components/HeaderBreadcrumbs';
 import Page from '../components/Page';
 import { ChatSidebar, ChatWindow } from './chat';
+import { PortProvider } from '../contexts/PortContext';
 
 // ----------------------------------------------------------------------
 
@@ -35,8 +36,10 @@ export default function ChatPage() {
           links={[{ name: 'Dashboard', href: PATH_DASHBOARD.root }, { name: 'Chat' }]}
         /> */}
         <Card sx={{ height: '90vh', display: 'flex' }}>
-          <ChatSidebar />
-          <ChatWindow />
+          <PortProvider name={'chat'}>
+            <ChatSidebar />
+            <ChatWindow />
+          </PortProvider>
         </Card>
       </Container>
     </Page>

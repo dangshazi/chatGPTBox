@@ -21,6 +21,8 @@ import ChatMessageInput from './ChatMessageInput';
 import ChatMessageList from './ChatMessageList'
 import ChatRoom from './ChatRoom'
 
+import {isReady} from '../../hooks/usePort'
+
 // ----------------------------------------------------------------------
 
 const conversationSelector = (state) => {
@@ -110,7 +112,7 @@ export default function ChatWindow() {
           <ChatMessageInput
             conversationId={activeConversationId}
             onSend={handleSendMessage}
-            disabled={pathname === PATH_DASHBOARD.chat.new}
+            disabled={pathname === PATH_DASHBOARD.chat.new || !isReady}
           />
         </Stack>
 
