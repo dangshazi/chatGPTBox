@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
 // @mui
-import { Box, Divider, Stack } from '@mui/material';
+import { Box, Divider, Stack, Typography } from '@mui/material'
 // redux
 import {
   addRecipients,
@@ -21,7 +21,7 @@ import ChatMessageInput from './ChatMessageInput';
 import ChatMessageList from './ChatMessageList'
 import ChatRoom from './ChatRoom'
 
-import {isReady} from '../../hooks/usePort'
+import usePort from '../../hooks/usePort'
 
 // ----------------------------------------------------------------------
 
@@ -44,49 +44,55 @@ const conversationSelector = (state) => {
 export default function ChatWindow() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { pathname } = useLocation();
-  const { conversationKey } = useParams();
-  const { contacts, recipients, participants, activeConversationId } = useSelector((state) => state.chat);
-  const conversation = useSelector((state) => conversationSelector(state));
+  const { isReady, postMessage, unfinishedAnswer, answerType } = usePort()
+  const { pathname } = useLocation()
+  const { conversationKey } = useParams()
+  const { contacts, recipients, participants, activeConversationId } = useSelector(
+    (state) => state.chat,
+  )
+  const conversation = useSelector((state) => conversationSelector(state))
 
-  const mode = conversationKey ? 'DETAIL' : 'COMPOSE';
-  const displayParticipants = participants.filter((item) => item.id !== '8864c717-587d-472a-929a-8e5f298024da-0');
+  const mode = conversationKey ? 'DETAIL' : 'COMPOSE'
+  const displayParticipants = participants.filter(
+    (item) => item.id !== '8864c717-587d-472a-929a-8e5f298024da-0',
+  )
 
   useEffect(() => {
     const getDetails = async () => {
-      dispatch(getParticipants(conversationKey));
+      dispatch(getParticipants(conversationKey))
       try {
-        await dispatch(getConversation(conversationKey));
+        await dispatch(getConversation(conversationKey))
       } catch (error) {
-        console.error(error);
-        navigate(PATH_DASHBOARD.chat.new);
+        console.error(error)
+        navigate(PATH_DASHBOARD.chat.new)
       }
-    };
+    }
     if (conversationKey) {
-      getDetails();
+      getDetails()
     } else if (activeConversationId) {
-      dispatch(resetActiveConversation());
+      dispatch(resetActiveConversation())
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [conversationKey]);
+  }, [conversationKey])
 
   useEffect(() => {
     if (activeConversationId) {
-      dispatch(markConversationAsRead(activeConversationId));
+      dispatch(markConversationAsRead(activeConversationId))
     }
-  }, [dispatch, activeConversationId]);
+  }, [dispatch, activeConversationId])
 
   const handleAddRecipients = (recipients) => {
-    dispatch(addRecipients(recipients));
-  };
+    dispatch(addRecipients(recipients))
+  }
 
   const handleSendMessage = async (value) => {
     try {
-      dispatch(onSendMessage(value));
+      dispatch(onSendMessage(value))
+      postMessage(value)
     } catch (error) {
-      console.error(error);
+      console.error(error)
     }
-  };
+  }
 
   return (
     <Stack sx={{ flexGrow: 1, minWidth: '1px' }}>
@@ -106,6 +112,8 @@ export default function ChatWindow() {
         <Stack sx={{ flexGrow: 1 }}>
           {/* 主要聊天内容 */}
           <ChatMessageList conversation={conversation} />
+          <Typography>{unfinishedAnswer}</Typography>
+          <Typography>{answerType}</Typography>
 
           <Divider />
 
