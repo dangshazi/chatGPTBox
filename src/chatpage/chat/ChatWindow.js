@@ -1,56 +1,22 @@
 import { useEffect } from 'react';
-import { useLocation, useNavigate, useParams } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 // @mui
-import { Box, Divider, Stack, Typography } from '@mui/material'
+import { Divider, Stack } from '@mui/material'
 // redux
-import {
-  addRecipients,
-  getConversation,
-  getParticipants,
-  markConversationAsRead,
-  onSendMessage,
-  resetActiveConversation,
-} from '../../redux/slices/chat'
+import { addRecipients, getParticipants, resetActiveConversation } from '../../redux/slices/chat'
 import { useDispatch, useSelector } from '../../redux/store'
-// routes
-import { PATH_DASHBOARD } from '../../routes/paths';
 //
+import { PortProvider } from '../../contexts/PortContext'
 import ChatHeaderCompose from './ChatHeaderCompose'
 import ChatHeaderDetail from './ChatHeaderDetail';
-import ChatMessageInput from './ChatMessageInput';
-import ChatMessageList from './ChatMessageList'
-import ChatRoom from './ChatRoom'
-
-import usePort from '../../hooks/usePort'
-
-// ----------------------------------------------------------------------
-
-const conversationSelector = (state) => {
-  const { conversations, activeConversationId } = state.chat;
-  const conversation = activeConversationId ? conversations.byId[activeConversationId] : null;
-  if (conversation) {
-    return conversation;
-  }
-  const initState = {
-    id: '',
-    messages: [],
-    participants: [],
-    unreadCount: 0,
-    type: '',
-  };
-  return initState;
-};
+import ChatMessageFrame from './ChatMessageFrame'
 
 export default function ChatWindow() {
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
-  const { isReady, postMessage, unfinishedAnswer, answerType } = usePort()
-  const { pathname } = useLocation()
+  const dispatch = useDispatch()
   const { conversationKey } = useParams()
   const { contacts, recipients, participants, activeConversationId } = useSelector(
     (state) => state.chat,
   )
-  const conversation = useSelector((state) => conversationSelector(state))
 
   const mode = conversationKey ? 'DETAIL' : 'COMPOSE'
   const displayParticipants = participants.filter(
@@ -58,41 +24,19 @@ export default function ChatWindow() {
   )
 
   useEffect(() => {
-    const getDetails = async () => {
+    const getParticipantsDetails = async () => {
       dispatch(getParticipants(conversationKey))
-      try {
-        await dispatch(getConversation(conversationKey))
-      } catch (error) {
-        console.error(error)
-        navigate(PATH_DASHBOARD.chat.new)
-      }
     }
     if (conversationKey) {
-      getDetails()
+      getParticipantsDetails()
     } else if (activeConversationId) {
       dispatch(resetActiveConversation())
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [conversationKey])
 
-  useEffect(() => {
-    if (activeConversationId) {
-      dispatch(markConversationAsRead(activeConversationId))
-    }
-  }, [dispatch, activeConversationId])
-
   const handleAddRecipients = (recipients) => {
     dispatch(addRecipients(recipients))
-  }
-
-  const handleSendMessage = async (value) => {
-    try {
-      dispatch(onSendMessage(value))
-      // 发送消息到backgroud
-      postMessage(value)
-    } catch (error) {
-      console.error(error)
-    }
   }
 
   return (
@@ -109,27 +53,9 @@ export default function ChatWindow() {
 
       <Divider />
 
-      <Box sx={{ flexGrow: 1, display: 'flex', overflow: 'hidden' }}>
-        <Stack sx={{ flexGrow: 1 }}>
-          {/* 主要聊天内容 */}
-          <ChatMessageList conversation={conversation} />
-          <Typography>{unfinishedAnswer}</Typography>
-          <Typography>{answerType}</Typography>
-
-          <Divider />
-
-          <ChatMessageInput
-            conversationId={activeConversationId}
-            onSend={handleSendMessage}
-            disabled={pathname === PATH_DASHBOARD.chat.new || !isReady}
-          />
-        </Stack>
-
-        {/* 对话右侧的详细信息 */}
-        {mode === 'DETAIL' && (
-          <ChatRoom conversation={conversation} participants={displayParticipants} />
-        )}
-      </Box>
+      <PortProvider name={'chat'}>
+        <ChatMessageFrame />
+      </PortProvider>
     </Stack>
   )
 }
