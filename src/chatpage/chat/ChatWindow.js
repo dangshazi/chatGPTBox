@@ -88,6 +88,7 @@ export default function ChatWindow() {
   const handleSendMessage = async (value) => {
     try {
       dispatch(onSendMessage(value))
+      // 发送消息到backgroud
       postMessage(value)
     } catch (error) {
       console.error(error)

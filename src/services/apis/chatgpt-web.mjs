@@ -412,11 +412,13 @@ export async function generateAnswersWithChatgptWebApi(port, question, session, 
       }
     }
 
+    // 将结果返回给前端
     if (answer) {
       port.postMessage({ answer: answer, done: false, session: null })
     }
   }
 
+  // push answer to conversationRecords
   function finishMessage() {
     pushRecord(session, question, answer)
     console.debug('conversation history', { content: session.conversationRecords })
