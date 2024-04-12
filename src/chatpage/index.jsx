@@ -23,13 +23,13 @@ import 'mapbox-gl/dist/mapbox-gl.css'
 import 'react-quill/dist/quill.snow.css'
 
 // slick-carousel
-import 'slick-carousel/slick/slick.css'
 import 'slick-carousel/slick/slick-theme.css'
+import 'slick-carousel/slick/slick.css'
 
 // lazy image
+import 'react-lazy-load-image-component/src/effects/black-and-white.css'
 import 'react-lazy-load-image-component/src/effects/blur.css'
 import 'react-lazy-load-image-component/src/effects/opacity.css'
-import 'react-lazy-load-image-component/src/effects/black-and-white.css'
 
 import NotistackProvider from '../components/NotistackProvider'
 import RtlLayout from '../components/RtlLayout'
@@ -54,8 +54,6 @@ import Router from '../routes'
 // import ChatPage from './ChatPage'
 import { AuthProvider } from '../contexts/JWTContext'
 
-document.body.style.margin = 0
-document.body.style.overflow = 'hidden'
 getPreferredLanguageKey().then((lang) => {
   changeLanguage(lang)
 })

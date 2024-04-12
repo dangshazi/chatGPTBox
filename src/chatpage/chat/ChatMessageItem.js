@@ -14,7 +14,7 @@ const RootStyle = styled('div')(({ theme }) => ({
 }))
 
 const ContentStyle = styled('div')(({ theme }) => ({
-  minWidth: 20,
+  minWidth: 5,
   maxWidth: 720,
   padding: theme.spacing(1.5),
   marginTop: theme.spacing(0.5),

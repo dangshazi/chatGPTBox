@@ -4,7 +4,7 @@ import { useEffect } from 'react';
 import { Card, Container } from '@mui/material';
 // redux
 import { getContacts, getConversations } from '../redux/slices/chat';
-import { useDispatch } from '../redux/store'
+import { useDispatch } from '../redux/store';
 
 
 // routes
@@ -14,8 +14,8 @@ import useSettings from '../hooks/useSettings';
 // components
 // import HeaderBreadcrumbs from '../components/HeaderBreadcrumbs';
 import Page from '../components/Page';
-import { ChatSidebar, ChatWindow } from './chat';
 import { PortProvider } from '../contexts/PortContext';
+import { ChatSidebar, ChatWindow } from './chat';
 
 // ----------------------------------------------------------------------
 

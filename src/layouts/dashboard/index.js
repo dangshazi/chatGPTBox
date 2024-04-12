@@ -1,18 +1,18 @@
 import { useState } from 'react';
 import { Outlet } from 'react-router-dom';
 // @mui
-import { styled } from '@mui/material/styles';
-import { Box } from '@mui/material';
+import { Box } from '@mui/material'
+import { styled } from '@mui/material/styles'
 // hooks
-import useSettings from '../../hooks/useSettings';
-import useResponsive from '../../hooks/useResponsive';
 import useCollapseDrawer from '../../hooks/useCollapseDrawer';
+import useResponsive from '../../hooks/useResponsive'
+import useSettings from '../../hooks/useSettings'
 // config
 import { HEADER, NAVBAR } from '../../config';
 //
-import DashboardHeader from './header';
-import NavbarVertical from './navbar/NavbarVertical';
+import DashboardHeader from './header'
 import NavbarHorizontal from './navbar/NavbarHorizontal';
+import NavbarVertical from './navbar/NavbarVertical'
 
 // ----------------------------------------------------------------------
 
@@ -21,7 +21,7 @@ const MainStyle = styled('main', {
 })(({ collapseClick, theme }) => ({
   flexGrow: 1,
   paddingTop: HEADER.MOBILE_HEIGHT + 24,
-  paddingBottom: HEADER.MOBILE_HEIGHT + 24,
+  // paddingBottom: HEADER.MOBILE_HEIGHT + 24,
   [theme.breakpoints.up('lg')]: {
     paddingLeft: 16,
     paddingRight: 16,
@@ -35,7 +35,7 @@ const MainStyle = styled('main', {
       marginLeft: NAVBAR.DASHBOARD_COLLAPSE_WIDTH,
     }),
   },
-}));
+}))
 
 // ----------------------------------------------------------------------
 
