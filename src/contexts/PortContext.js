@@ -74,6 +74,8 @@ const handlers = {
       ...state,
       isResponsing: true,
       session: session,
+      unfinishedAnswer: `Waiting for response...`,
+      answerType: 'answer',
     }
   },
   UPDATE_ANSWER: (state, action) => {
@@ -172,7 +174,19 @@ function PortProvider({ children, name }) {
     }
   }
 
-  const postMessage = async (question) => {
+  const postMessage = async (minimalMsg) => {
+    // Transform minimal message to question
+    // minimal message example:
+    //   {
+    //     "conversationId": "e99f09a7-dd88-49d5-b1c8-1daf80c2d7b2",
+    //     "messageId": "14735d82-a340-4172-b6c0-9f7cec150d84",
+    //     "message": "1+1\\n",
+    //     "contentType": "text",
+    //     "attachments": [],
+    //     "createdAt": "2024-04-12T07:15:22.244Z",
+    //     "senderId": "8864c717-587d-472a-929a-8e5f298024da-0"
+    // }
+    const question = minimalMsg.message
     const newSession = { ...session, question, isRetry: false }
     postMessageBySession({ session: newSession })
     dispatch({ type: 'POST_MSG', payload: { session: newSession } })
