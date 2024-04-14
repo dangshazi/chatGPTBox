@@ -422,6 +422,7 @@ export async function generateAnswersWithChatgptWebApi(port, question, session, 
   function finishMessage() {
     pushRecord(session, question, answer)
     console.debug('conversation history', { content: session.conversationRecords })
+    // 这里会将包含此轮对话的session传回给前端
     port.postMessage({ answer: answer, done: true, session: session })
   }
 }
