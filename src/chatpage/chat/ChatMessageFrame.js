@@ -91,7 +91,7 @@ export default function ChatMessageFrame() {
   }
 
   useEffect(() => {
-    if (!isResponsing && activeConversationId) {
+    if (isResponsing !== undefined && !isResponsing && activeConversationId) {
       dispatch(
         onSendMessage({
           conversationId: activeConversationId,
