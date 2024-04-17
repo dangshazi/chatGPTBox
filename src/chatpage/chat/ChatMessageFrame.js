@@ -1,7 +1,9 @@
 import { useEffect } from 'react'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
 // @mui
-import { Box, Divider, Stack } from '@mui/material'
+import { Box, Divider, IconButton, Stack } from '@mui/material'
+// components
+import Iconify from '../../components/Iconify'
 // redux
 import {
   getConversation,
@@ -19,7 +21,6 @@ import ChatMessageList from './ChatMessageList'
 import ChatRoom from './ChatRoom'
 
 // utils
-
 import usePort from '../../hooks/usePort'
 
 // ----------------------------------------------------------------------
@@ -43,7 +44,15 @@ const conversationSelector = (state) => {
 export default function ChatMessageFrame() {
   const dispatch = useDispatch()
   const navigate = useNavigate()
-  const { isReady, postMessage, currentMessageId, unfinishedAnswer, error, answerType, isResponsing } = usePort()
+  const {
+    isReady,
+    postMessage,
+    currentMessageId,
+    unfinishedAnswer,
+    error,
+    answerType,
+    isResponsing,
+  } = usePort()
   const { pathname } = useLocation()
   const { conversationKey } = useParams()
   const { participants, activeConversationId } = useSelector((state) => state.chat)
@@ -126,8 +135,37 @@ export default function ChatMessageFrame() {
       <Stack sx={{ flexGrow: 1 }}>
         {/* 主要聊天内容 */}
         <ChatMessageList conversation={conversation} />
-        <Divider />
-
+        <Divider
+          sx={{
+            height: '1px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            overflow: 'visible',
+          }}
+        >
+          <IconButton>
+            <Iconify icon="eva:brush-outline" width={40} height={30} />
+          </IconButton>
+        </Divider>
+        <Box sx={{ display: 'flex', overflow: 'hidden' }}>
+          <IconButton>
+            <Iconify icon="eva:book-open-outline" width={20} height={20} />
+          </IconButton>
+          <Divider orientation="vertical" variant="middle" flexItem />
+          <IconButton>
+            <Iconify icon="eva:attach-outline" width={20} height={20} />
+          </IconButton>
+          <Box sx={{ flexGrow: 1 }} />
+          <IconButton>
+            <Iconify icon="eva:options-2-outline" width={20} height={20} />
+          </IconButton>
+          <Divider orientation="vertical" variant="middle" flexItem />
+          <IconButton>
+            <Iconify icon="eva:clock-outline" width={20} height={20} />
+          </IconButton>
+        </Box>
+        {/* <Divider /> */}
         <ChatMessageInput
           conversationId={activeConversationId}
           onSend={handleSendMessage}
