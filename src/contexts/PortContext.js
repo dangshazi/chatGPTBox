@@ -309,6 +309,7 @@ function PortProvider({ children, name }) {
   }, [activeConversationId])
 
   useEffect(() => {
+    console.log('PortContext initializing:', name)
     const closeChatsListener = (message) => {
       if (message.type === 'CLOSE_CHATS') {
         Object.values(state).forEach((singleState) => {

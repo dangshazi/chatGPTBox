@@ -6,6 +6,8 @@ import { styled } from '@mui/material/styles'
 // components
 import Image from '../../components/Image'
 
+import { MuiMarkdown, getOverrides } from 'mui-markdown'
+
 // ----------------------------------------------------------------------
 
 const RootStyle = styled('div')(({ theme }) => ({
@@ -94,7 +96,15 @@ export default function ChatMessageItem({ message, conversation, onOpenLightbox 
                 sx={{ borderRadius: 1, cursor: 'pointer', '&:hover': { opacity: 0.8 } }}
               />
             ) : (
-              <Typography style={{ wordWrap: "break-word" }} variant="body2">{message.body}</Typography>
+              <MuiMarkdown
+                overrides={{
+                  ...getOverrides(),
+                }}
+                style={{ wordWrap: 'break-word' }}
+                variant="body2"
+              >
+                {message.body}
+              </MuiMarkdown>
             )}
           </ContentStyle>
         </div>

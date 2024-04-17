@@ -1,7 +1,7 @@
 import { useEffect } from 'react'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
 // @mui
-import { Box, Divider, Stack, Typography } from '@mui/material'
+import { Box, Divider, Stack } from '@mui/material'
 // redux
 import {
   getConversation,
@@ -43,7 +43,7 @@ const conversationSelector = (state) => {
 export default function ChatMessageFrame() {
   const dispatch = useDispatch()
   const navigate = useNavigate()
-  const { isReady, postMessage, unfinishedAnswer, answerType, isResponsing } = usePort()
+  const { isReady, postMessage, unfinishedAnswer, isResponsing } = usePort()
   const { pathname } = useLocation()
   const { conversationKey } = useParams()
   const { participants, activeConversationId } = useSelector((state) => state.chat)
@@ -111,9 +111,6 @@ export default function ChatMessageFrame() {
       <Stack sx={{ flexGrow: 1 }}>
         {/* 主要聊天内容 */}
         <ChatMessageList conversation={conversation} />
-        <Typography>{unfinishedAnswer}</Typography>
-        <Typography>{answerType}</Typography>
-
         <Divider />
 
         <ChatMessageInput
