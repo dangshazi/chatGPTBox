@@ -59,13 +59,16 @@ const slice = createSlice({
       const conversation = action.payload;
 
       if (conversation) {
-        state.conversations.byId[conversation.id] = conversation;
-        state.activeConversationId = conversation.id;
+        state.activeConversationId = conversation.id
         if (!state.conversations.allIds.includes(conversation.id)) {
-          state.conversations.allIds.push(conversation.id);
+          state.conversations.allIds.push(conversation.id)
+          state.conversations.byId[conversation.id] = conversation
+        } else {
+          // TODO: Merge with existing conversation
+          // state.conversations.byId[conversation.id] = conversation;
         }
       } else {
-        state.activeConversationId = null;
+        state.activeConversationId = null
       }
     },
 
