@@ -30,6 +30,12 @@ const InfoStyle = styled(Typography)(({ theme }) => ({
   color: theme.palette.text.secondary,
 }))
 
+const ErrorStyle = styled(Typography)(({ theme }) => ({
+  display: 'flex',
+  marginBottom: theme.spacing(0.75),
+  color: theme.palette.error.main,
+}))
+
 // ----------------------------------------------------------------------
 
 ChatMessageItem.propTypes = {
@@ -107,6 +113,17 @@ export default function ChatMessageItem({ message, conversation, onOpenLightbox 
               </MuiMarkdown>
             )}
           </ContentStyle>
+          {message.error != null && (
+            <ErrorStyle
+              variant="caption"
+              sx={{
+                ...(isMe && { justifyContent: 'flex-end' }),
+              }}
+            >
+              {/* {!isMe && `${firstName},`}&nbsp; */}
+              {message.error}
+            </ErrorStyle>
+          )}
         </div>
       </Box>
     </RootStyle>

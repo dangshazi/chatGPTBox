@@ -43,7 +43,7 @@ const conversationSelector = (state) => {
 export default function ChatMessageFrame() {
   const dispatch = useDispatch()
   const navigate = useNavigate()
-  const { isReady, postMessage, currentMessageId, unfinishedAnswer, isResponsing } = usePort()
+  const { isReady, postMessage, currentMessageId, unfinishedAnswer, error, answerType, isResponsing } = usePort()
   const { pathname } = useLocation()
   const { conversationKey } = useParams()
   const { participants, activeConversationId } = useSelector((state) => state.chat)
@@ -91,7 +91,7 @@ export default function ChatMessageFrame() {
   }
 
   useEffect(() => {
-    if (unfinishedAnswer != null && activeConversationId) {
+    if (answerType === 'answer' && unfinishedAnswer != null && activeConversationId) {
       dispatch(
         onUpdateMessage({
           conversationId: activeConversationId,
@@ -104,7 +104,22 @@ export default function ChatMessageFrame() {
         }),
       )
     }
-  }, [unfinishedAnswer])
+
+    if (answerType === 'error' && error != null && activeConversationId) {
+      dispatch(
+        onUpdateMessage({
+          conversationId: activeConversationId,
+          messageId: currentMessageId,
+          message: unfinishedAnswer,
+          error: error,
+          contentType: 'text',
+          attachments: [],
+          createdAt: new Date(),
+          senderId: oneParticipant.id,
+        }),
+      )
+    }
+  }, [unfinishedAnswer, answerType])
 
   return (
     <Box sx={{ flexGrow: 1, display: 'flex', overflow: 'hidden' }}>

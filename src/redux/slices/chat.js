@@ -75,11 +75,12 @@ const slice = createSlice({
     // ON SEND MESSAGE
     onSendMessage(state, action) {
       const conversationMsg = action.payload;
-      const { conversationId, messageId, message, contentType, attachments, createdAt, senderId } = conversationMsg;
+      const { conversationId, messageId, error, message, contentType, attachments, createdAt, senderId } = conversationMsg;
 
       const newMessage = {
         id: messageId,
         body: message,
+        error,
         contentType,
         attachments,
         createdAt,
@@ -92,11 +93,12 @@ const slice = createSlice({
     // ON UPDATE MESSAGE
     onUpdateMessage(state, action) {
       const conversationMsg = action.payload;
-      const { conversationId, messageId, message, contentType, attachments, createdAt, senderId } = conversationMsg;
+      const { conversationId, messageId, error, message, contentType, attachments, createdAt, senderId } = conversationMsg;
 
       const newMessage = {
         id: messageId,
         body: message,
+        error,
         contentType,
         attachments,
         createdAt,

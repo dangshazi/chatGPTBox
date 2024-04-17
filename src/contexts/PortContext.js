@@ -20,6 +20,7 @@ const conversationState = {
   isReady: false, // Port是否准备好
   port: null,
   isResponsing: false, // background是否正在response
+  error: null,
   unfinishedAnswer: null, // 未完成的answer
   currentMessageId: null,
   answerType: null,
@@ -35,6 +36,7 @@ const initialState = {
 
 // 1. 先创建一个context
 const PortContext = createContext(initialState)
+const WAITING_RESPONSE = `Waiting for response...`
 
 const handlers = {
   CONNECT: (state, action) => {
@@ -50,23 +52,7 @@ const handlers = {
       port,
     }
   },
-  CLOSE: (state) => {
-    if (state.port) {
-      state.port.disconnect()
-    }
-    return {
-      ...state,
-      isReady: false,
-      port: null,
-      isResponsing: false,
-      unfinishedAnswer: null,
-    }
-  },
-  // LOGOUT: (state) => ({
-  //   ...state,
-  //   isAuthenticated: false,
-  //   user: null,
-  // }),
+
   POST_MSG: (state, action) => {
     const { session } = action.payload
 
@@ -74,7 +60,8 @@ const handlers = {
       ...state,
       isResponsing: true,
       session: session,
-      unfinishedAnswer: `Waiting for response...`,
+      error: null,
+      unfinishedAnswer: WAITING_RESPONSE,
       answerType: 'answer',
       currentMessageId: uuidv4(),
     }
@@ -84,21 +71,52 @@ const handlers = {
 
     return {
       ...state,
+      error: null,
       unfinishedAnswer,
       answerType,
     }
   },
+
+  REPORT_ERROR: (state, action) => {
+    const { error, answerType } = action.payload
+
+    const answer =
+      WAITING_RESPONSE === state.unfinishedAnswer ? 'Fail to get answer' : state.unfinishedAnswer
+
+    return {
+      ...state,
+      unfinishedAnswer: answer,
+      error,
+      answerType,
+    }
+  },
+
   RESPONSE_DONE: (state) => {
     return {
       ...state,
       isResponsing: false,
     }
   },
+
   UPDATE_SESSION: (state, action) => {
     const { session } = action.payload
     return {
       ...state,
       session,
+    }
+  },
+
+  CLOSE: (state) => {
+    if (state.port) {
+      state.port.disconnect()
+    }
+    return {
+      ...state,
+      isReady: false,
+      port: null,
+      error: null,
+      isResponsing: false,
+      unfinishedAnswer: null,
     }
   },
 }
@@ -130,7 +148,6 @@ function PortProvider({ children, name }) {
 
   // Get active conversation
   const { activeConversationId } = useSelector((chatState) => chatState.chat)
-  // const conversation = useSelector((state) => conversationSelector(state))
 
   // 这里使用redux的useReducer 来处理复杂的state
   const [state, dispatch] = useReducer(reducer, {})
@@ -209,7 +226,10 @@ function PortProvider({ children, name }) {
     const question = minimalMsg.message
     const newSession = { ...session, question, isRetry: false }
     postMessageBySession({ session: newSession })
-    dispatch({ type: 'POST_MSG', payload: { conversationId: activeConversationId, session: newSession } })
+    dispatch({
+      type: 'POST_MSG',
+      payload: { conversationId: activeConversationId, session: newSession },
+    })
   }
 
   // 接受来自background的消息
@@ -240,10 +260,10 @@ function PortProvider({ children, name }) {
       switch (msg.error) {
         case 'UNAUTHORIZED':
           dispatch({
-            type: 'UPDATE_ANSWER',
+            type: 'REPORT_ERROR',
             payload: {
               conversationId: sender.conversationId,
-              unfinishedAnswer:
+              error:
                 `${t('UNAUTHORIZED')}<br>${t('Please login at https://chat.openai.com first')}${
                   isSafari() ? `<br>${t('Then open https://chat.openai.com/api/auth/session')}` : ''
                 }<br>${t('And refresh this page or type you question again')}` +
@@ -256,10 +276,10 @@ function PortProvider({ children, name }) {
           break
         case 'CLOUDFLARE':
           dispatch({
-            type: 'UPDATE_ANSWER',
+            type: 'REPORT_ERROR',
             payload: {
               conversationId: sender.conversationId,
-              unfinishedAnswer:
+              error:
                 `${t('OpenAI Security Check Required')}<br>${
                   isSafari()
                     ? t('Please open https://chat.openai.com/api/auth/session')
@@ -282,10 +302,10 @@ function PortProvider({ children, name }) {
               console.error('JSON parse error', e)
             }
           dispatch({
-            type: 'UPDATE_ANSWER',
+            type: 'REPORT_ERROR',
             payload: {
               conversationId: sender.conversationId,
-              unfinishedAnswer: t(formattedError),
+              error: t(formattedError),
               answerType: 'error',
             },
           })
@@ -329,7 +349,7 @@ function PortProvider({ children, name }) {
     return () => {
       Browser.runtime.onMessage.removeListener(closeChatsListener)
     }
-  })
+  }, [])
 
   useEffect(() => {
     const portReconnectListener = (oldPort) => {
@@ -338,13 +358,13 @@ function PortProvider({ children, name }) {
         console.error(`Disconnected due to an error: ${oldPort.error.message}`)
       }
       try {
-        dispatch({ type: 'CONNECT', payload: { conversationId: oldPort.conversationId }})
+        dispatch({ type: 'CONNECT', payload: { conversationId: oldPort.conversationId } })
         console.debug('port[%s] initialized', oldPort.conversationId)
       } catch (err) {
         console.error('Fail to initialize port', err)
       }
     }
-    
+
     if (!useForegroundFetch) {
       port?.onMessage.addListener(messageListener)
     }
