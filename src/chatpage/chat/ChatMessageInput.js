@@ -15,8 +15,10 @@ const RootStyle = styled('div')(({ theme }) => ({
   minHeight: 56,
   display: 'flex',
   position: 'relative',
-  alignItems: 'stretch',
-  paddingLeft: theme.spacing(2),
+  alignItems: 'center',
+  paddingLeft: theme.spacing(0.5),
+  paddingTop: theme.spacing(1.5),
+  paddingBottom: theme.spacing(1.5),
 }));
 
 // ----------------------------------------------------------------------
@@ -36,7 +38,7 @@ export default function ChatMessageInput({ disabled, conversationId, onSend }) {
   };
 
   const handleKeyUp = (event) => {
-    if (event.key === 'Enter') {
+    if (event.key === 'Enter' && event.ctrlKey) {
       handleSend();
     }
   };
@@ -65,12 +67,13 @@ export default function ChatMessageInput({ disabled, conversationId, onSend }) {
         disabled={disabled}
         fullWidth
         multiline
+        minRows={3}
         maxRows={4}
         value={message}
         disableUnderline
         onKeyUp={handleKeyUp}
         onChange={(event) => setMessage(event.target.value)}
-        placeholder="Type a message"
+        placeholder="Ctrl+Enter to submit the prompt message"
         startAdornment={
           <InputAdornment position="start">
             <EmojiPicker disabled={disabled} value={message} setValue={setMessage} />
