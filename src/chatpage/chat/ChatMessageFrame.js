@@ -7,6 +7,7 @@ import {
   getConversation,
   markConversationAsRead,
   onSendMessage,
+  onUpdateMessage,
   resetActiveConversation,
 } from '../../redux/slices/chat'
 import { useDispatch, useSelector } from '../../redux/store'
@@ -18,7 +19,6 @@ import ChatMessageList from './ChatMessageList'
 import ChatRoom from './ChatRoom'
 
 // utils
-import uuidv4 from '../../utils/uuidv4'
 
 import usePort from '../../hooks/usePort'
 
@@ -43,7 +43,7 @@ const conversationSelector = (state) => {
 export default function ChatMessageFrame() {
   const dispatch = useDispatch()
   const navigate = useNavigate()
-  const { isReady, postMessage, unfinishedAnswer, isResponsing } = usePort()
+  const { isReady, postMessage, currentMessageId, unfinishedAnswer, isResponsing } = usePort()
   const { pathname } = useLocation()
   const { conversationKey } = useParams()
   const { participants, activeConversationId } = useSelector((state) => state.chat)
@@ -91,11 +91,11 @@ export default function ChatMessageFrame() {
   }
 
   useEffect(() => {
-    if (isResponsing !== undefined && !isResponsing && activeConversationId) {
+    if (unfinishedAnswer != null && activeConversationId) {
       dispatch(
-        onSendMessage({
+        onUpdateMessage({
           conversationId: activeConversationId,
-          messageId: uuidv4(),
+          messageId: currentMessageId,
           message: unfinishedAnswer,
           contentType: 'text',
           attachments: [],
@@ -104,7 +104,7 @@ export default function ChatMessageFrame() {
         }),
       )
     }
-  }, [isResponsing])
+  }, [unfinishedAnswer])
 
   return (
     <Box sx={{ flexGrow: 1, display: 'flex', overflow: 'hidden' }}>

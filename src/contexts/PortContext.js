@@ -10,7 +10,8 @@ import { handlePortError } from '../services/wrappers.mjs'
 import { isSafari } from '../utils'
 
 import { useSelector } from '../redux/store'
-
+// utils
+import uuidv4 from '../utils/uuidv4'
 // hooks
 
 // ----------------------------------------------------------------------
@@ -20,6 +21,7 @@ const conversationState = {
   port: null,
   isResponsing: false, // background是否正在response
   unfinishedAnswer: null, // 未完成的answer
+  currentMessageId: null,
   answerType: null,
   session: {}, // 当前会话
 }
@@ -74,6 +76,7 @@ const handlers = {
       session: session,
       unfinishedAnswer: `Waiting for response...`,
       answerType: 'answer',
+      currentMessageId: uuidv4(),
     }
   },
   UPDATE_ANSWER: (state, action) => {

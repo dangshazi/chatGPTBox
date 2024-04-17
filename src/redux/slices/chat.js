@@ -74,8 +74,8 @@ const slice = createSlice({
 
     // ON SEND MESSAGE
     onSendMessage(state, action) {
-      const conversation = action.payload;
-      const { conversationId, messageId, message, contentType, attachments, createdAt, senderId } = conversation;
+      const conversationMsg = action.payload;
+      const { conversationId, messageId, message, contentType, attachments, createdAt, senderId } = conversationMsg;
 
       const newMessage = {
         id: messageId,
@@ -87,6 +87,34 @@ const slice = createSlice({
       };
 
       state.conversations.byId[conversationId].messages.push(newMessage);
+    },
+
+    // ON UPDATE MESSAGE
+    onUpdateMessage(state, action) {
+      const conversationMsg = action.payload;
+      const { conversationId, messageId, message, contentType, attachments, createdAt, senderId } = conversationMsg;
+
+      const newMessage = {
+        id: messageId,
+        body: message,
+        contentType,
+        attachments,
+        createdAt,
+        senderId,
+      };
+      let updated = false;
+      state.conversations.byId[conversationId].messages = state.conversations.byId[conversationId].messages.map(
+        (message) => {
+          if (message.id === messageId) {
+            updated = true;
+            return newMessage;
+          }
+          return message;
+        }
+      );
+      if (!updated) {
+        state.conversations.byId[conversationId].messages.push(newMessage);
+      }
     },
 
     markConversationAsReadSuccess(state, action) {
@@ -119,7 +147,7 @@ const slice = createSlice({
 export default slice.reducer;
 
 // Actions
-export const { addRecipients, onSendMessage, resetActiveConversation } = slice.actions;
+export const { addRecipients, onSendMessage, onUpdateMessage, resetActiveConversation } = slice.actions;
 
 // ----------------------------------------------------------------------
 
