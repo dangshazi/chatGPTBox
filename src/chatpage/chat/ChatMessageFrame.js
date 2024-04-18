@@ -16,6 +16,7 @@ import { useDispatch, useSelector } from '../../redux/store'
 // routes
 import { PATH_DASHBOARD } from '../../routes/paths'
 //
+import WritingOutline from '../../components/animate/svg/WritingOutline'
 import ChatMessageInput from './ChatMessageInput'
 import ChatMessageList from './ChatMessageList'
 import ChatRoom from './ChatRoom'
@@ -144,9 +145,7 @@ export default function ChatMessageFrame() {
             overflow: 'visible',
           }}
         >
-          <IconButton>
-            <Iconify icon="eva:brush-outline" width={40} height={30} />
-          </IconButton>
+          {isResponsing && <WritingOutline />}
         </Divider>
         <Box sx={{ display: 'flex', overflow: 'hidden' }}>
           <IconButton>
