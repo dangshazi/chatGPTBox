@@ -11,7 +11,7 @@ import AccountProfile from './account/AccountProfile'
 
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { defaultConfig, getPreferredLanguageKey, setUserConfig } from '../config/index.mjs'
+import { getPreferredLanguageKey, getUserConfig, setUserConfig } from '../config/index.mjs'
 
 import Page from '../components/Page'
 import { AdvancedConfig } from './sections/AdvancedConfig'
@@ -19,10 +19,11 @@ import { GeneralConfig } from './sections/GeneralConfig'
 import { GptModelConfig } from './sections/GptModelConfig'
 
 // ----------------------------------------------------------------------
+const localUserConfig = await getUserConfig()
 
 export default function UserAccount() {
   const { currentTab, onChangeTab } = useTabs('general')
-  const [config, setConfig] = useState(defaultConfig)
+  const [config, setConfig] = useState(localUserConfig)
   // const [currentVersion, setCurrentVersion] = useState('')
   // const [latestVersion, setLatestVersion] = useState('')
 
