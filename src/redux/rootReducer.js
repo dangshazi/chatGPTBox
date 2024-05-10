@@ -14,8 +14,8 @@ const rootPersistConfig = {
   key: 'root',
   storage,
   keyPrefix: 'redux-',
-  whitelist: [],
-};
+  // whitelist: [],
+}
 
 // const productPersistConfig = {
 //   key: 'product',
@@ -30,6 +30,6 @@ const rootReducer = combineReducers({
   // calendar: calendarReducer,
   kanban: kanbanReducer,
   // product: persistReducer(productPersistConfig, productReducer),
-});
+})
 
 export { rootPersistConfig, rootReducer };
