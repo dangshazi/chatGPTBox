@@ -21,61 +21,6 @@ export const ModelMode = {
   fast: 'Fast',
 }
 
-export const chatgptWebModelKeys = [
-  'chatgptFree35',
-  'chatgptPlus4',
-  'chatgptFree35Mobile',
-  'chatgptPlus4Browsing',
-  'chatgptPlus4Mobile',
-]
-export const bingWebModelKeys = ['bingFree4', 'bingFreeSydney']
-export const bardWebModelKeys = ['bardWebFree']
-export const claudeWebModelKeys = ['claude2WebFree']
-export const moonshotWebModelKeys = ['moonshotWebFree']
-export const gptApiModelKeys = ['gptApiInstruct', 'gptApiDavinci']
-export const chatgptApiModelKeys = [
-  'chatgptApi35',
-  'chatgptApi35_16k',
-  'chatgptApi35_1106',
-  'chatgptApi35_0125',
-  'chatgptApi4_8k',
-  'chatgptApi4_8k_0613',
-  'chatgptApi4_32k',
-  'chatgptApi4_32k_0613',
-  'chatgptApi4_128k',
-  'chatgptApi4_128k_preview',
-  'chatgptApi4_128k_1106_preview',
-  'chatgptApi4_128k_0125_preview',
-]
-export const customApiModelKeys = ['customModel']
-export const azureOpenAiApiModelKeys = ['azureOpenAi']
-export const claudeApiModelKeys = [
-  'claude12Api',
-  'claude2Api',
-  'claude21Api',
-  'claude3HaikuApi',
-  'claude3SonnetApi',
-  'claude3OpusApi',
-]
-export const chatglmApiModelKeys = ['chatglmTurbo']
-export const githubThirdPartyApiModelKeys = ['waylaidwandererApi']
-export const poeWebModelKeys = [
-  'poeAiWebSage', //poe.com/Assistant
-  'poeAiWebGPT4',
-  'poeAiWebGPT4_32k',
-  'poeAiWebClaudePlus',
-  'poeAiWebClaude',
-  'poeAiWebClaude100k',
-  'poeAiWebCustom',
-  'poeAiWebChatGpt',
-  'poeAiWebChatGpt_16k',
-  'poeAiWebGooglePaLM',
-  'poeAiWeb_Llama_2_7b',
-  'poeAiWeb_Llama_2_13b',
-  'poeAiWeb_Llama_2_70b',
-]
-export const moonshotApiModelKeys = ['moonshot_v1_8k', 'moonshot_v1_32k', 'moonshot_v1_128k']
-
 /**
  * @typedef {object} Model
  * @property {string} value
