@@ -11,7 +11,12 @@ import AccountProfile from './account/AccountProfile'
 
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { getPreferredLanguageKey, getUserConfig, setUserConfig } from '../config/index.mjs'
+import {
+  getPreferredLanguageKey,
+  getUserConfig,
+  setUserConfig,
+  removeUserConfig,
+} from '../config/index.mjs'
 
 import Page from '../components/Page'
 import { AdvancedConfig } from './sections/AdvancedConfig'
@@ -32,6 +37,14 @@ export default function UserAccount() {
     // 这里保存了两份配置，一份是默认的配置，一份是UserConfig
     setConfig({ ...config, ...value })
     setUserConfig(value)
+  }
+
+  const removeConfig = (key) => {
+    // 这里保存了两份配置，一份是默认的配置，一份是UserConfig
+    // eslint-disable-next-line no-unused-vars
+    const { [key]: _, ...rest } = config
+    setConfig(rest)
+    removeUserConfig(key)
   }
 
   useEffect(() => {
@@ -68,7 +81,9 @@ export default function UserAccount() {
     {
       value: 'gpt_model',
       icon: <Iconify icon={'ic:round-calculate'} width={20} height={20} />,
-      component: <GptModelConfig config={config} updateConfig={updateConfig} />,
+      component: (
+        <GptModelConfig config={config} updateConfig={updateConfig} removeConfig={removeConfig} />
+      ),
     },
 
     {

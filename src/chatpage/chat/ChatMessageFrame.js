@@ -161,7 +161,7 @@ export default function ChatMessageFrame() {
           </IconButton>
           <Divider orientation="vertical" variant="middle" flexItem />
           <IconButton>
-            <Iconify icon="eva:clock-outline" width={20} height={20} />
+            <Iconify icon="material-symbols:device-reset" width={20} height={20} />
           </IconButton>
         </Box>
         {/* <Divider /> */}

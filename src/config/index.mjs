@@ -573,6 +573,11 @@ export async function setUserConfig(value) {
     })
 }
 
+// remove specific user config from local storage
+export async function removeUserConfig(key) {
+  await Browser.storage.local.remove(key)
+}
+
 export async function setAccessToken(accessToken) {
   await setUserConfig({ accessToken, tokenSavedOn: Date.now() })
 }
@@ -584,4 +589,8 @@ export async function clearOldAccessToken() {
   if (duration > TOKEN_DURATION) {
     await setAccessToken('')
   }
+}
+
+export async function removeAccessToken() {
+  await removeUserConfig('accessToken')
 }

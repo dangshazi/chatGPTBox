@@ -2,7 +2,18 @@ import PropTypes from 'prop-types'
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 
-import { Card, FormControlLabel, Grid, Stack, Switch, Typography } from '@mui/material'
+import {
+  Card,
+  FormControlLabel,
+  Grid,
+  IconButton,
+  Stack,
+  Switch,
+  Tooltip,
+  Typography,
+} from '@mui/material'
+
+import Iconify from '../../components/Iconify'
 
 import ApiKeyField from '../../components/passwordField/ApiKeyField'
 import {
@@ -24,12 +35,18 @@ import {
 GptModelConfig.propTypes = {
   config: PropTypes.object.isRequired,
   updateConfig: PropTypes.func.isRequired,
+  removeConfig: PropTypes.func.isRequired,
 }
 
-export function GptModelConfig({ config, updateConfig }) {
+export function GptModelConfig({ config, updateConfig, removeConfig }) {
   // eslint-disable-next-line no-unused-vars
   const { t, i18n } = useTranslation()
-  console.info(OpenAIAPIModels)
+  // console.info(OpenAIAPIModels)
+
+  const clearConfig = (e, key) => {
+    console.debug('clear config', key)
+    removeConfig(key)
+  }
 
   return (
     <Grid container spacing={3}>
@@ -290,6 +307,11 @@ export function GptModelConfig({ config, updateConfig }) {
           <Stack spacing={2} direction="column" sx={{ p: 3 }}>
             <Typography variant="overline" sx={{ color: 'text.secondary' }}>
               OpenAI Models via Web
+              <Tooltip title="Clear access token" arrow>
+                <IconButton onClick={(e) => clearConfig(e, 'accessToken')}>
+                  <Iconify icon={'icon-park-solid:clear-format'} width={15} height={15} />
+                </IconButton>
+              </Tooltip>
             </Typography>
             {Object.keys(ChatgptWebModels).map((modelName) => {
               let desc
