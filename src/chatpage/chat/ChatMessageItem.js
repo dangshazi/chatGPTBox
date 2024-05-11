@@ -107,7 +107,7 @@ export default function ChatMessageItem({ message, conversation, onOpenLightbox 
                   ...getOverrides(),
                 }}
                 style={{ wordWrap: 'break-word' }}
-                variant="body2"
+                variant="body3"
               >
                 {message.body}
               </MuiMarkdown>
