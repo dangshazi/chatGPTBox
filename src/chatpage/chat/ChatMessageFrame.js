@@ -92,6 +92,7 @@ export default function ChatMessageFrame() {
 
   const handleSendMessage = async (value) => {
     try {
+      // 发送消息到Redux进行存储
       dispatch(onSendMessage(value))
       // 发送消息到backgroud
       postMessage(value)
@@ -145,7 +146,12 @@ export default function ChatMessageFrame() {
             overflow: 'visible',
           }}
         >
-          {isResponsing && <WritingOutline />}
+          {isResponsing &&
+            (
+              <IconButton onClick={() => postMessage({ stop: true })}>
+                <WritingOutline />
+              </IconButton>
+            )}
         </Divider>
         <Box sx={{ display: 'flex', overflow: 'hidden' }}>
           <IconButton>

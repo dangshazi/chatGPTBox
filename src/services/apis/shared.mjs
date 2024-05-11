@@ -23,6 +23,7 @@ export function setAbortController(port, onStop, onDisconnect) {
     if (msg.stop) {
       port.onMessage.removeListener(messageListener)
       console.debug('stop generating')
+      port.postMessage({ error: 'stop replying' })
       port.postMessage({ done: true })
       controller.abort()
       if (onStop) onStop()
