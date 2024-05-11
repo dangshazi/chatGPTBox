@@ -7,7 +7,7 @@ import { isValidToken, setSession } from '../utils/jwt';
 // ----------------------------------------------------------------------
 
 const initialState = {
-  isAuthenticated: false,
+  isAuthenticated: true,
   isInitialized: false,
   user: null,
 };
