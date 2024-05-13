@@ -5,6 +5,8 @@ import { Avatar, Box, Typography } from '@mui/material'
 import { styled } from '@mui/material/styles'
 // components
 import Image from '../../components/Image'
+// hooks
+import useResponsive from '../../hooks/useResponsive';
 
 import { MuiMarkdown, getOverrides } from 'mui-markdown'
 
@@ -45,6 +47,7 @@ ChatMessageItem.propTypes = {
 }
 
 export default function ChatMessageItem({ message, conversation, onOpenLightbox }) {
+  const isMobile = useResponsive('down', 'md');
   const sender = conversation.participants.find(
     (participant) => participant.id === message.senderId,
   )
@@ -67,7 +70,7 @@ export default function ChatMessageItem({ message, conversation, onOpenLightbox 
           }),
         }}
       >
-        {senderDetails.type !== 'me' && (
+        {senderDetails.type !== 'me' && !isMobile && (
           <Avatar
             alt={senderDetails.name}
             src={senderDetails.avatar}
