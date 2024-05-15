@@ -12,13 +12,12 @@ import Iconify from '../../components/Iconify';
 // ----------------------------------------------------------------------
 
 const RootStyle = styled('div')(({ theme }) => ({
+  flexShrink: 0,
   minHeight: 56,
   display: 'flex',
   position: 'relative',
   alignItems: 'center',
   paddingLeft: theme.spacing(0.5),
-  paddingTop: theme.spacing(1.5),
-  paddingBottom: theme.spacing(1.5),
 }));
 
 // ----------------------------------------------------------------------

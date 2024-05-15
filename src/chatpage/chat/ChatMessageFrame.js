@@ -1,9 +1,9 @@
-import { useEffect } from 'react'
-import { useLocation, useNavigate, useParams } from 'react-router-dom'
+import { useEffect } from 'react';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 // @mui
-import { Box, Divider, IconButton, Stack } from '@mui/material'
+import { Box, Divider, IconButton, Stack } from '@mui/material';
 // components
-import Iconify from '../../components/Iconify'
+import Iconify from '../../components/Iconify';
 // redux
 import {
   getConversation,
@@ -11,18 +11,20 @@ import {
   onSendMessage,
   onUpdateMessage,
   resetActiveConversation,
-} from '../../redux/slices/chat'
-import { useDispatch, useSelector } from '../../redux/store'
+} from '../../redux/slices/chat';
+import { useDispatch, useSelector } from '../../redux/store';
 // routes
-import { PATH_DASHBOARD } from '../../routes/paths'
+import { PATH_DASHBOARD } from '../../routes/paths';
 //
-import WritingOutline from '../../components/animate/svg/WritingOutline'
-import ChatMessageInput from './ChatMessageInput'
-import ChatMessageList from './ChatMessageList'
-import ChatRoom from './ChatRoom'
+import WritingOutline from '../../components/animate/svg/WritingOutline';
+import ChatMessageInput from './ChatMessageInput';
+import ChatMessageList from './ChatMessageList';
+import ChatRoom from './ChatRoom';
 
 // utils
-import usePort from '../../hooks/usePort'
+import usePort from '../../hooks/usePort';
+
+import ChatSelectionCard from './ChatSelectionCard';
 
 // ----------------------------------------------------------------------
 
@@ -137,6 +139,7 @@ export default function ChatMessageFrame() {
       <Stack sx={{ flexGrow: 1 }}>
         {/* 主要聊天内容 */}
         <ChatMessageList conversation={conversation} />
+        <ChatSelectionCard />
         <Divider
           sx={{
             height: '1px',
@@ -146,14 +149,13 @@ export default function ChatMessageFrame() {
             overflow: 'visible',
           }}
         >
-          {isResponsing &&
-            (
-              <IconButton onClick={() => postMessage({ stop: true })}>
-                <WritingOutline />
-              </IconButton>
-            )}
+          {isResponsing && (
+            <IconButton onClick={() => postMessage({ stop: true })}>
+              <WritingOutline />
+            </IconButton>
+          )}
         </Divider>
-        <Box sx={{ display: 'flex', overflow: 'hidden' }}>
+        <Box sx={{ display: 'flex', flexShrink: 0, overflow: 'hidden' }}>
           <IconButton>
             <Iconify icon="eva:book-open-outline" width={20} height={20} />
           </IconButton>

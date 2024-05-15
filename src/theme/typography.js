@@ -66,7 +66,7 @@ const typography = {
     fontSize: pxToRem(14),
   },
   body3: {
-    lineHeight: 22 / 11,
+    lineHeight: 1.2,
     fontSize: pxToRem(11),
   },
   caption: {

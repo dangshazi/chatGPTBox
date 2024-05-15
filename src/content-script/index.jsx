@@ -150,7 +150,9 @@ async function prepareForSelectionTools() {
         ?.toString()
         .trim()
         .replace(/^-+|-+$/g, '')
+      const selectionText = window.getSelection()?.toString()
       if (selection) {
+        Browser.storage.local.set({ selectionContent: selectionText })
         let position
         // 计算Toolsbar的位置
         const config = await getUserConfig()
@@ -174,6 +176,9 @@ async function prepareForSelectionTools() {
     })
   })
   document.addEventListener('mousedown', (e) => {
+    setTimeout(async () => {
+      Browser.storage.local.set({ selectionContent: window.getSelection()?.toString() })
+    })
     if (toolbarContainer && toolbarContainer.contains(e.target)) return
 
     document.querySelectorAll('.chatgptbox-toolbar-container').forEach((e) => e.remove())
