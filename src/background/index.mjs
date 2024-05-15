@@ -339,15 +339,15 @@ try {
   )
 
   // side panel
-  Browser.tabs.onUpdated.addListener(async (tabId, info, tab) => {
-    if (!tab.url) return
-    // eslint-disable-next-line no-undef
-    await chrome.sidePanel.setOptions({
-      tabId,
-      path: 'chatpage.html',
-      enabled: true,
-    })
-  })
+  // Browser.tabs.onUpdated.addListener(async (tabId, info, tab) => {
+  //   if (!tab.url) return
+  //   // eslint-disable-next-line no-undef
+  //   await chrome.sidePanel.setOptions({
+  //     tabId,
+  //     path: 'chatpage.html',
+  //     enabled: true,
+  //   })
+  // })
 } catch (error) {
   console.log(error)
 }
