@@ -110,6 +110,7 @@ async function getInput(inputQuery) {
   }
 }
 
+// Toolbar 前端
 let toolbarContainer
 const deleteToolbar = () => {
   if (toolbarContainer && toolbarContainer.className === 'chatgptbox-toolbar-container')
@@ -119,6 +120,7 @@ const deleteToolbar = () => {
 const createSelectionTools = async (toolbarContainer, selection) => {
   toolbarContainer.className = 'chatgptbox-toolbar-container'
   render(
+    // 注意这里没有传递triggered
     <FloatingToolbar
       session={initSession({ modelName: (await getUserConfig()).modelName })}
       selection={selection}
@@ -130,15 +132,19 @@ const createSelectionTools = async (toolbarContainer, selection) => {
 }
 
 async function prepareForSelectionTools() {
+  // 选择文本的时候，mouseup会触发
   document.addEventListener('mouseup', (e) => {
+    // 如果选中的是Toolbar，就不做任何事情
     if (toolbarContainer && toolbarContainer.contains(e.target)) return
     const selectionElement =
       window.getSelection()?.rangeCount > 0 &&
       window.getSelection()?.getRangeAt(0).endContainer.parentElement
+    // 如果选中的内容是Toolbar内的元素，就不做任何事情
     if (toolbarContainer && selectionElement && toolbarContainer.contains(selectionElement)) return
 
     deleteToolbar()
     setTimeout(async () => {
+      // 获取选中的文本
       const selection = window
         .getSelection()
         ?.toString()
@@ -146,7 +152,7 @@ async function prepareForSelectionTools() {
         .replace(/^-+|-+$/g, '')
       if (selection) {
         let position
-
+        // 计算Toolsbar的位置
         const config = await getUserConfig()
         if (!config.selectionToolsNextToInputBox) position = { x: e.pageX + 20, y: e.pageY + 20 }
         else {
@@ -161,6 +167,7 @@ async function prepareForSelectionTools() {
             position = { x: e.pageX + 20, y: e.pageY + 20 }
           }
         }
+        // 渲染Toolbar
         toolbarContainer = createElementAtPosition(position.x, position.y)
         await createSelectionTools(toolbarContainer, selection)
       }
@@ -184,6 +191,7 @@ async function prepareForSelectionTools() {
   })
 }
 
+// Mobile 版本的 prepareForSelectionTools
 async function prepareForSelectionToolsTouch() {
   document.addEventListener('touchend', (e) => {
     if (toolbarContainer && toolbarContainer.contains(e.target)) return
@@ -219,7 +227,7 @@ async function prepareForSelectionToolsTouch() {
 
 let menuX, menuY
 
-// 这是FloatingToolbar
+// 右键点击
 async function prepareForRightClickMenu() {
   document.addEventListener('contextmenu', (e) => {
     menuX = e.clientX
@@ -337,6 +345,7 @@ async function prepareForForegroundRequests() {
   if (chatgptWebModelKeys.includes(userConfig.modelName)) {
     const div = document.createElement('div')
     document.body.append(div)
+    // Chatgpt页面上的通知栏
     render(<NotificationForChatGPTWeb container={div} />, div)
   }
 

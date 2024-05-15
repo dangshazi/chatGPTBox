@@ -1,12 +1,12 @@
-import { cloneElement, useCallback, useEffect, useState } from 'react'
-import ConversationCard from '../ConversationCard'
 import PropTypes from 'prop-types'
-import { config as toolsConfig } from '../../content-script/selection-tools'
-import { getClientPosition, isMobile, setElementPositionInViewport } from '../../utils'
+import { cloneElement, useCallback, useEffect, useState } from 'react'
 import Draggable from 'react-draggable'
-import { useClampWindowSize } from '../../hooks/use-clamp-window-size'
 import { useTranslation } from 'react-i18next'
+import { config as toolsConfig } from '../../content-script/selection-tools'
+import { useClampWindowSize } from '../../hooks/use-clamp-window-size'
 import { useConfig } from '../../hooks/use-config.mjs'
+import { getClientPosition, isMobile, setElementPositionInViewport } from '../../utils'
+import ConversationCard from '../ConversationCard'
 
 // const logo = Browser.runtime.getURL('logo.png')
 
@@ -49,6 +49,7 @@ function FloatingToolbar(props) {
 
   if (!render) return <div />
 
+  // triggered用来区分是DraggableCard还是FloatingToolbar
   if (triggered) {
     const updatePosition = () => {
       const newPosition = setElementPositionInViewport(props.container, position.x, position.y)
