@@ -1,8 +1,8 @@
-import { useState } from 'react';
 import { formatDistanceToNowStrict } from 'date-fns';
 import PropTypes from 'prop-types';
+import { useState } from 'react';
 // @mui
-import { Avatar, Box, Typography, IconButton, } from '@mui/material';
+import { Avatar, Box, IconButton, Typography, } from '@mui/material';
 
 import { styled } from '@mui/material/styles';
 // components
@@ -10,7 +10,7 @@ import Image from '../../components/Image';
 // hooks
 import useResponsive from '../../hooks/useResponsive';
 // components
-import Iconify from '../../components/Iconify'
+import Iconify from '../../components/Iconify';
 
 import { MuiMarkdown, getOverrides } from 'mui-markdown';
 
@@ -46,15 +46,16 @@ const ErrorStyle = styled(Typography)(({ theme }) => ({
 // ----------------------------------------------------------------------
 
 ChatMessageItem.propTypes = {
+  index: PropTypes.number.isRequired,
   message: PropTypes.object.isRequired,
   conversation: PropTypes.object.isRequired,
   onOpenLightbox: PropTypes.func,
 }
 
-export default function ChatMessageItem({ message, conversation, onOpenLightbox }) {
+export default function ChatMessageItem({ index, message, conversation, onOpenLightbox }) {
   // truncte message
   const messageSummary = message.body.length > 100 ? message.body.slice(0, 100) + '...' : message.body
-
+  const messageNumInConversation = conversation.messages.length
   const isMobile = useResponsive('down', 'md');
   const [expanded, setExpanded] = useState(true);
   const sender = conversation.participants.find(
@@ -69,6 +70,8 @@ export default function ChatMessageItem({ message, conversation, onOpenLightbox 
   const isImage = message.contentType === 'image'
   const firstName = senderDetails.name && senderDetails.name.split(' ')[0]
 
+  const [show, setShow] = useState(false);
+
   return (
     <RootStyle>
       <Box
@@ -78,6 +81,8 @@ export default function ChatMessageItem({ message, conversation, onOpenLightbox 
             ml: 'auto',
           }),
         }}
+        onMouseEnter={() => setShow(true)}
+        onMouseLeave={() => setShow(false)}
       >
         {senderDetails.type !== 'me' && !isMobile && (
           <Avatar
@@ -136,24 +141,29 @@ export default function ChatMessageItem({ message, conversation, onOpenLightbox 
             </ErrorStyle>
           )}
 
-          <Box sx={{ display: 'flex', }}>
-            <Box sx={{ flexGrow: 1 }} />
-            <IconButton onClick={() => setExpanded(!expanded)}>
-              {expanded ? <Iconify icon="eva:arrow-ios-downward-outline" width={13} height={13} /> : <Iconify icon="eva:arrow-ios-forward-outline" width={13} height={13} />}
-            </IconButton>
-            <IconButton>
-              <Iconify icon="eva:sync-outline" width={13} height={13} />
-            </IconButton>
-            <IconButton>
-              <Iconify icon="fa6-regular:paste" width={13} height={13} />
-            </IconButton>
-            <IconButton>
-              <Iconify icon="eva:bookmark-outline" width={13} height={13} />
-            </IconButton>
-            <IconButton>
-              <Iconify icon="eva:trash-2-outline" width={13} height={13} />
-            </IconButton>
-          </Box>
+          {
+            show && (<Box sx={{ display: 'flex', }} >
+              <Box sx={{ flexGrow: 1 }} />
+              <IconButton onClick={() => setExpanded(!expanded)}>
+                {expanded ? <Iconify icon="eva:arrow-ios-downward-outline" width={13} height={13} /> : <Iconify icon="eva:arrow-ios-forward-outline" width={13} height={13} />}
+              </IconButton>
+              {
+                index == messageNumInConversation - 1 &&
+                <IconButton>
+                  <Iconify icon="eva:sync-outline" width={13} height={13} />
+                </IconButton>
+              }
+              <IconButton>
+                <Iconify icon="fa6-regular:paste" width={13} height={13} />
+              </IconButton>
+              <IconButton>
+                <Iconify icon="eva:bookmark-outline" width={13} height={13} />
+              </IconButton>
+              <IconButton>
+                <Iconify icon="eva:trash-2-outline" width={13} height={13} />
+              </IconButton>
+            </Box>)
+          }
         </div>
       </Box>
     </RootStyle>
