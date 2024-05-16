@@ -4,6 +4,11 @@ import { useNavigate } from 'react-router-dom';
 import { List } from '@mui/material';
 // routes
 import { PATH_DASHBOARD } from '../../routes/paths';
+// redux
+import {
+  changeActiveConversationId
+} from '../../redux/slices/chat';
+import { useDispatch } from '../../redux/store';
 // components
 import { SkeletonConversationItem } from '../../components/skeleton';
 //
@@ -20,6 +25,7 @@ ChatConversationList.propTypes = {
 
 export default function ChatConversationList({ conversations, isOpenSidebar, activeConversationId, sx, ...other }) {
   const navigate = useNavigate();
+  const dispatch = useDispatch()
 
   const handleSelectConversation = (conversationId) => {
     let conversationKey = '';
@@ -35,6 +41,7 @@ export default function ChatConversationList({ conversations, isOpenSidebar, act
       }
     }
     navigate(PATH_DASHBOARD.chat.view(conversationKey));
+    dispatch(changeActiveConversationId(conversationId));
   };
 
   const loading = !conversations.allIds.length;

@@ -236,6 +236,7 @@ function PortProvider({ children, name }) {
   const messageListener = (msg, sender) => {
     // append fragment of answer when use socket
     if (msg.answer) {
+      console.debug('answer:', msg.answer)
       dispatch({
         type: 'UPDATE_ANSWER',
         payload: {

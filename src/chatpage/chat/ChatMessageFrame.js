@@ -7,10 +7,11 @@ import Iconify from '../../components/Iconify';
 // redux
 import {
   getConversation,
+  getParticipants,
   markConversationAsRead,
   onSendMessage,
   onUpdateMessage,
-  resetActiveConversation,
+  resetActiveConversation
 } from '../../redux/slices/chat';
 import { useDispatch, useSelector } from '../../redux/store';
 // routes
@@ -28,9 +29,8 @@ import ChatSelectionCard from './ChatSelectionCard';
 
 // ----------------------------------------------------------------------
 
-const conversationSelector = (state) => {
-  const { conversations, activeConversationId } = state.chat
-  const conversation = activeConversationId ? conversations.byId[activeConversationId] : null
+const conversationSelector = (state, activeConversationId) => {
+  const conversation = activeConversationId ? state.chat.conversations.byId[activeConversationId] : null
   if (conversation) {
     return conversation
   }
@@ -58,8 +58,9 @@ export default function ChatMessageFrame() {
   } = usePort()
   const { pathname } = useLocation()
   const { conversationKey } = useParams()
-  const { participants, activeConversationId } = useSelector((state) => state.chat)
-  const conversation = useSelector((state) => conversationSelector(state))
+  const participants = useSelector((state) => state.chat.participants)
+  const activeConversationId = useSelector((state) => state.chat.activeConversationId)
+  const conversation = useSelector((state) => conversationSelector(state, activeConversationId))
 
   const mode = conversationKey ? 'DETAIL' : 'COMPOSE'
   const displayParticipants = participants.filter(
@@ -70,7 +71,7 @@ export default function ChatMessageFrame() {
 
   useEffect(() => {
     const getConversationDetails = async () => {
-      // dispatch(getParticipants(conversationKey))
+      dispatch(getParticipants(conversationKey))
       try {
         await dispatch(getConversation(conversationKey))
       } catch (error) {

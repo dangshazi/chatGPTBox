@@ -195,6 +195,11 @@ const slice = createSlice({
       state.activeConversationId = null
     },
 
+    changeActiveConversationId(state, action) {
+      const { activeConversationId } = action.payload
+      state.activeConversationId = activeConversationId
+    },
+
     addRecipients(state, action) {
       const recipients = action.payload
       state.recipients = recipients
@@ -281,5 +286,13 @@ export function getParticipants(conversationKey) {
     } catch (error) {
       dispatch(slice.actions.hasError(error));
     }
+  };
+}
+
+// ----------------------------------------------------------------------
+
+export function changeActiveConversationId(activeConversationId) {
+  return async () => {
+    dispatch(slice.actions.changeActiveConversationId({ activeConversationId }));
   };
 }

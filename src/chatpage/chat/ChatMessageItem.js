@@ -1,6 +1,6 @@
 import { formatDistanceToNowStrict } from 'date-fns';
 import PropTypes from 'prop-types';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 // @mui
 import { Avatar, Box, IconButton, Typography, } from '@mui/material';
 
@@ -54,20 +54,27 @@ ChatMessageItem.propTypes = {
 
 export default function ChatMessageItem({ index, message, conversation, onOpenLightbox }) {
   // truncte message
-  const messageSummary = message.body.length > 100 ? message.body.slice(0, 100) + '...' : message.body
+  const messageSummary = useMemo(
+    () => message.body.length > 100 ? message.body.slice(0, 100) + '...' : message.body
+    , [message.body]
+  )
   const messageNumInConversation = conversation.messages.length
   const isMobile = useResponsive('down', 'md');
   const [expanded, setExpanded] = useState(true);
   const sender = conversation.participants.find(
     (participant) => participant.id === message.senderId,
   )
+  const cachedMessage = useMemo(
+    () => message,
+    [message],
+  )
   const senderDetails =
-    message.senderId === '8864c717-587d-472a-929a-8e5f298024da-0'
+    cachedMessage.senderId === '8864c717-587d-472a-929a-8e5f298024da-0'
       ? { type: 'me' }
       : { avatar: sender?.avatar, name: sender?.name }
 
   const isMe = senderDetails.type === 'me'
-  const isImage = message.contentType === 'image'
+  const isImage = cachedMessage.contentType === 'image'
   const firstName = senderDetails.name && senderDetails.name.split(' ')[0]
 
   const [show, setShow] = useState(false);
@@ -100,7 +107,7 @@ export default function ChatMessageItem({ index, message, conversation, onOpenLi
             }}
           >
             {!isMe && `${firstName},`}&nbsp;
-            {formatDistanceToNowStrict(new Date(message.createdAt), {
+            {formatDistanceToNowStrict(new Date(cachedMessage.createdAt), {
               addSuffix: true,
             })}
           </InfoStyle>
@@ -114,8 +121,8 @@ export default function ChatMessageItem({ index, message, conversation, onOpenLi
             {isImage ? (
               <Image
                 alt="attachment"
-                src={message.body}
-                onClick={() => onOpenLightbox(message.body)}
+                src={cachedMessage.body}
+                onClick={() => onOpenLightbox(cachedMessage.body)}
                 sx={{ borderRadius: 1, cursor: 'pointer', '&:hover': { opacity: 0.8 } }}
               />
             ) : (
@@ -126,18 +133,18 @@ export default function ChatMessageItem({ index, message, conversation, onOpenLi
                 style={{ wordWrap: 'break-word' }}
                 variant="body3"
               >
-                {expanded ? message.body : messageSummary}
+                  {expanded ? cachedMessage.body : messageSummary}
               </MuiMarkdown>
             )}
           </ContentStyle>
-          {message.error != null && (
+          {cachedMessage.error != null && (
             <ErrorStyle
               variant="caption"
               sx={{
                 ...(isMe && { justifyContent: 'flex-end' }),
               }}
             >
-              {message.error}
+              {cachedMessage.error}
             </ErrorStyle>
           )}
 
