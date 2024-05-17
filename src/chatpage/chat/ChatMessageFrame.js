@@ -44,16 +44,20 @@ const conversationSelector = (state, activeConversationId) => {
   return initState
 }
 
+/**
+ * 负责将用户的消息发送到Redux存储，并将用户的消息通过PortContext的postMessage发送到background
+ * @returns 
+ */
 export default function ChatMessageFrame() {
   const dispatch = useDispatch()
   const navigate = useNavigate()
   const {
     isReady,
     postMessage,
-    currentMessageId,
-    unfinishedAnswer,
-    error,
-    answerType,
+    // currentMessageId,
+    // unfinishedAnswer,
+    // error,
+    // answerType,
     isResponsing,
   } = usePort()
   const { pathname } = useLocation()
@@ -67,7 +71,7 @@ export default function ChatMessageFrame() {
     (item) => item.id !== '8864c717-587d-472a-929a-8e5f298024da-0',
   )
 
-  const oneParticipant = [...participants][0]
+  // const oneParticipant = [...participants][0]
 
   useEffect(() => {
     const getConversationDetails = async () => {
@@ -104,36 +108,36 @@ export default function ChatMessageFrame() {
     }
   }
 
-  useEffect(() => {
-    if (answerType === 'answer' && unfinishedAnswer != null && activeConversationId) {
-      dispatch(
-        onUpdateMessage({
-          conversationId: activeConversationId,
-          messageId: currentMessageId,
-          message: unfinishedAnswer,
-          contentType: 'text',
-          attachments: [],
-          createdAt: new Date(),
-          senderId: oneParticipant.id,
-        }),
-      )
-    }
+  // useEffect(() => {
+  //   if (answerType === 'answer' && unfinishedAnswer != null && activeConversationId) {
+  //     dispatch(
+  //       onUpdateMessage({
+  //         conversationId: activeConversationId,
+  //         messageId: currentMessageId,
+  //         message: unfinishedAnswer,
+  //         contentType: 'text',
+  //         attachments: [],
+  //         createdAt: new Date(),
+  //         senderId: oneParticipant.id,
+  //       }),
+  //     )
+  //   }
 
-    if (answerType === 'error' && error != null && activeConversationId) {
-      dispatch(
-        onUpdateMessage({
-          conversationId: activeConversationId,
-          messageId: currentMessageId,
-          message: unfinishedAnswer,
-          error: error,
-          contentType: 'text',
-          attachments: [],
-          createdAt: new Date(),
-          senderId: oneParticipant.id,
-        }),
-      )
-    }
-  }, [unfinishedAnswer, answerType])
+  //   if (answerType === 'error' && error != null && activeConversationId) {
+  //     dispatch(
+  //       onUpdateMessage({
+  //         conversationId: activeConversationId,
+  //         messageId: currentMessageId,
+  //         message: unfinishedAnswer,
+  //         error: error,
+  //         contentType: 'text',
+  //         attachments: [],
+  //         createdAt: new Date(),
+  //         senderId: oneParticipant.id,
+  //       }),
+  //     )
+  //   }
+  // }, [unfinishedAnswer, answerType])
 
   return (
     <Box sx={{ flexGrow: 1, display: 'flex', overflow: 'hidden' }}>

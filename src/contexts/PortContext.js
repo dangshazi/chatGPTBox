@@ -9,9 +9,14 @@ import { initSession } from '../services/init-session.mjs'
 import { handlePortError } from '../services/wrappers.mjs'
 import { isSafari } from '../utils'
 
-import { useSelector } from '../redux/store'
+import { useDispatch, useSelector } from '../../redux/store'
 // utils
 import uuidv4 from '../utils/uuidv4'
+// redux
+import {
+  onUpdateMessage
+} from '../../redux/slices/chat';
+
 // hooks
 
 // ----------------------------------------------------------------------
@@ -20,10 +25,10 @@ const conversationState = {
   isReady: false, // Port是否准备好
   port: null,
   isResponsing: false, // background是否正在response
-  error: null,
-  unfinishedAnswer: null, // 未完成的answer
+  // answerType: null,
+  // error: null,
+  // unfinishedAnswer: null, // 未完成的answer
   currentMessageId: null,
-  answerType: null,
   session: {}, // 当前会话
 }
 
@@ -48,7 +53,7 @@ const handlers = {
       ...state,
       isReady: true,
       session: initSession(),
-      answerType: 'answer',
+      // answerType: 'answer',
       port,
     }
   },
@@ -60,36 +65,36 @@ const handlers = {
       ...state,
       isResponsing: true,
       session: session,
-      error: null,
-      unfinishedAnswer: WAITING_RESPONSE,
-      answerType: 'answer',
+      // error: null,
+      // unfinishedAnswer: WAITING_RESPONSE,
+      // answerType: 'answer',
       currentMessageId: uuidv4(),
     }
   },
-  UPDATE_ANSWER: (state, action) => {
-    const { unfinishedAnswer, answerType } = action.payload
+  // UPDATE_ANSWER: (state, action) => {
+  //   const { unfinishedAnswer, answerType } = action.payload
 
-    return {
-      ...state,
-      error: null,
-      unfinishedAnswer,
-      answerType,
-    }
-  },
+  //   return {
+  //     ...state,
+  //     error: null,
+  //     unfinishedAnswer,
+  //     answerType,
+  //   }
+  // },
 
-  REPORT_ERROR: (state, action) => {
-    const { error, answerType } = action.payload
+  // REPORT_ERROR: (state, action) => {
+  //   const { error, answerType } = action.payload
 
-    const answer =
-      WAITING_RESPONSE === state.unfinishedAnswer ? 'Fail to get answer' : state.unfinishedAnswer
+  //   const answer =
+  //     WAITING_RESPONSE === state.unfinishedAnswer ? 'Fail to get answer' : state.unfinishedAnswer
 
-    return {
-      ...state,
-      unfinishedAnswer: answer,
-      error,
-      answerType,
-    }
-  },
+  //   return {
+  //     ...state,
+  //     unfinishedAnswer: answer,
+  //     error,
+  //     answerType,
+  //   }
+  // },
 
   RESPONSE_DONE: (state) => {
     return {
@@ -114,9 +119,9 @@ const handlers = {
       ...state,
       isReady: false,
       port: null,
-      error: null,
+      // error: null,
       isResponsing: false,
-      unfinishedAnswer: null,
+      // unfinishedAnswer: null,
     }
   },
 }
@@ -143,8 +148,14 @@ PortProvider.propTypes = {
 }
 
 // 学习provider 模式的样板
+/**
+ * 负责将background的回复的消息传递给redux存储，并给ChatMessageFrame提供postMessage方法
+ * @param {*} param0 
+ * @returns 
+ */
 function PortProvider({ children, name }) {
   const { t } = useTranslation()
+  const reduxDispatch = useDispatch()
 
   // Get active conversation
   const { activeConversationId } = useSelector((chatState) => chatState.chat)
@@ -159,6 +170,49 @@ function PortProvider({ children, name }) {
   )
 
   const foregroundMessageListeners = useRef([])
+
+  const updateMessageInStore = (payload) => {
+    const curentState = state[activeConversationId] || conversationState
+    const updatedCurrentConversationState = {
+      ...curentState,
+      ...payload,
+    }
+    const {
+      conversationId,
+      unfinishedAnswer,
+      error,
+      answerType,
+      currentMessageId,
+    } = updatedCurrentConversationState
+    if (answerType === 'answer' && unfinishedAnswer != null) {
+      dispatch(
+        onUpdateMessage({
+          conversationId,
+          messageId: currentMessageId,
+          message: unfinishedAnswer,
+          contentType: 'text',
+          attachments: [],
+          createdAt: new Date(),
+          senderId: oneParticipant.id,
+        }),
+      )
+    }
+
+    if (answerType === 'error' && error != null) {
+      dispatch(
+        onUpdateMessage({
+          conversationId,
+          messageId: currentMessageId,
+          message: unfinishedAnswer,
+          error: error,
+          contentType: 'text',
+          attachments: [],
+          createdAt: new Date(),
+          senderId: oneParticipant.id,
+        }),
+      )
+    }
+  }
 
   // 向background发送消息
   const postMessageBySession = async ({ session, stop }) => {
@@ -211,6 +265,7 @@ function PortProvider({ children, name }) {
     }
   }
 
+  // 这个方法是给ChatMessageFrame用的,所以不需要存储到redux，ChatMessageFrame会自己去存储
   const postMessage = async (minimalMsg) => {
     // Transform minimal message to question
     // minimal message example:
@@ -226,6 +281,7 @@ function PortProvider({ children, name }) {
     const question = minimalMsg.message
     const newSession = { ...session, question, isRetry: false }
     postMessageBySession({ session: newSession })
+    // 更新State
     dispatch({
       type: 'POST_MSG',
       payload: { conversationId: activeConversationId, session: newSession },
@@ -237,14 +293,17 @@ function PortProvider({ children, name }) {
     // append fragment of answer when use socket
     if (msg.answer) {
       console.debug('answer:', msg.answer)
-      dispatch({
-        type: 'UPDATE_ANSWER',
-        payload: {
-          conversationId: sender.conversationId,
-          unfinishedAnswer: msg.answer,
-          answerType: 'answer',
-        },
-      })
+      const payload = {
+        conversationId: sender.conversationId,
+        unfinishedAnswer: msg.answer,
+        error: null,
+        answerType: 'answer',
+      }
+      // dispatch({
+      //   type: 'UPDATE_ANSWER',
+      //   payload,
+      // })
+      updateMessageInStore(payload)
     }
     if (msg.session) {
       if (msg.done) msg.session = { ...msg.session, isRetry: false }
@@ -258,40 +317,33 @@ function PortProvider({ children, name }) {
       dispatch({ type: 'RESPONSE_DONE', payload: { conversationId: sender.conversationId } })
     }
     if (msg.error) {
+      const payload = {}
       switch (msg.error) {
         case 'UNAUTHORIZED':
-          dispatch({
-            type: 'REPORT_ERROR',
-            payload: {
-              conversationId: sender.conversationId,
-              error:
-                `${t('UNAUTHORIZED')}<br>${t('Please login at https://chat.openai.com first')}${
-                  isSafari() ? `<br>${t('Then open https://chat.openai.com/api/auth/session')}` : ''
-                }<br>${t('And refresh this page or type you question again')}` +
-                `<br><br>${t(
-                  'Consider creating an api key at https://platform.openai.com/account/api-keys',
-                )}`,
-              answerType: 'error',
-            },
-          })
+          payload = {
+            conversationId: sender.conversationId,
+            error:
+              `${t('UNAUTHORIZED')}<br>${t('Please login at https://chat.openai.com first')}${isSafari() ? `<br>${t('Then open https://chat.openai.com/api/auth/session')}` : ''
+              }<br>${t('And refresh this page or type you question again')}` +
+              `<br><br>${t(
+                'Consider creating an api key at https://platform.openai.com/account/api-keys',
+              )}`,
+            answerType: 'error',
+          }
           break
         case 'CLOUDFLARE':
-          dispatch({
-            type: 'REPORT_ERROR',
-            payload: {
-              conversationId: sender.conversationId,
-              error:
-                `${t('OpenAI Security Check Required')}<br>${
-                  isSafari()
-                    ? t('Please open https://chat.openai.com/api/auth/session')
-                    : t('Please open https://chat.openai.com')
-                }<br>${t('And refresh this page or type you question again')}` +
-                `<br><br>${t(
-                  'Consider creating an api key at https://platform.openai.com/account/api-keys',
-                )}`,
-              answerType: 'error',
-            },
-          })
+          payload = {
+            conversationId: sender.conversationId,
+            error:
+              `${t('OpenAI Security Check Required')}<br>${isSafari()
+                ? t('Please open https://chat.openai.com/api/auth/session')
+                : t('Please open https://chat.openai.com')
+              }<br>${t('And refresh this page or type you question again')}` +
+              `<br><br>${t(
+                'Consider creating an api key at https://platform.openai.com/account/api-keys',
+              )}`,
+            answerType: 'error',
+          }
           break
         default: {
           let formattedError = msg.error
@@ -302,17 +354,16 @@ function PortProvider({ children, name }) {
               /* empty */
               console.error('JSON parse error', e)
             }
-          dispatch({
-            type: 'REPORT_ERROR',
-            payload: {
-              conversationId: sender.conversationId,
-              error: t(formattedError),
-              answerType: 'error',
-            },
-          })
+          payload = {
+            conversationId: sender.conversationId,
+            error: t(formattedError),
+            answerType: 'error',
+          }
           break
         }
       }
+      // dispatch({ type: 'REPORT_ERROR', payload: payload })
+      updateMessageInStore(payload)
       dispatch({ type: 'RESPONSE_DONE', payload: { conversationId: sender.conversationId } })
     }
   }
